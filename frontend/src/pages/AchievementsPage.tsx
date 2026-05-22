@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getAchievements, doCheckin, getCheckin } from '../api/game'
+import { getAchievements, doCheckin, getCheckin, checkAchievements } from '../api/game'
 import type { Achievement, CheckinData } from '../api/game'
 import { TopNav } from '../components/layout/TopNav'
 import { CheckinCalendar } from '../components/gamification/CheckinCalendar'
@@ -10,7 +10,8 @@ export function AchievementsPage() {
   const [streakMsg, setStreakMsg] = useState('')
 
   useEffect(() => {
-    getAchievements().then(setAchievements)
+    // Catch-up: check achievements based on existing progress
+    checkAchievements().then(() => getAchievements().then(setAchievements))
     getCheckin().then(setCheckin)
   }, [])
 
