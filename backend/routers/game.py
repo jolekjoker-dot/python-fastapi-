@@ -80,15 +80,40 @@ async def trigger_achievement_check(
             current_ids.add(a["id"])
             newly_unlocked.append(a)
 
+    # Track which achievements have had XP awarded
+    xp_pref_row = await db.execute(
+        select(UserPreference).where(
+            UserPreference.user_id == current_user.id,
+            UserPreference.key == "achievement_xp_awarded",
+        )
+    )
+    xp_pref = xp_pref_row.scalars().first()
+    xp_awarded_ids = set(xp_pref.value.split(",")) if xp_pref and xp_pref.value else set()
+
     if newly_unlocked:
         if pref:
             pref.value = ",".join(sorted(current_ids))
         else:
             db.add(UserPreference(user_id=current_user.id, key="achievements", value=",".join(sorted(current_ids))))
-        # Award XP for new achievements
-        for a in newly_unlocked:
-            current_user.xp += a["xp"]
-        await db.commit()
+
+    # Award XP for achievements (new + previously missed)
+    for a_id in current_ids:
+        if a_id not in xp_awarded_ids:
+            ach = next((a for a in ACHIEVEMENTS if a["id"] == a_id), None)
+            if ach:
+                current_user.xp += ach["xp"]
+                xp_awarded_ids.add(a_id)
+
+    if xp_awarded_ids:
+        if xp_pref:
+            xp_pref.value = ",".join(sorted(xp_awarded_ids))
+        else:
+            db.add(UserPreference(user_id=current_user.id, key="achievement_xp_awarded", value=",".join(sorted(xp_awarded_ids))))
+
+    # Recalculate level
+    current_user.level = current_user.xp // 1000 + 1
+
+    await db.commit()
 
     return {"new_achievements": newly_unlocked}
 
