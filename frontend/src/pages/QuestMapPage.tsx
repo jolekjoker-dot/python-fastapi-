@@ -41,57 +41,57 @@ export function QuestMapPage() {
 
         {/* Quest nodes */}
         <div className="max-w-3xl mx-auto">
-          <div className="flex flex-wrap justify-center gap-4">
-            {phase1.map((quest, i, arr) => {
+          <div className="flex flex-wrap justify-center items-center gap-0">
+            {phase1.flatMap((quest, i, arr) => {
               const isLast = quest.order === 10
-              return (
-                <div key={quest.id} className="flex items-center">
-                  <button
-                    onClick={() => {
-                      if (quest.unlocked || quest.completed) {
-                        navigate(`/quest/${quest.id}`)
-                      }
-                    }}
-                    disabled={!quest.unlocked && !quest.completed}
-                    className={`w-36 h-36 rounded-xl flex flex-col items-center justify-center gap-1 border-2 transition-all cursor-pointer ${
-                      quest.completed
-                        ? 'border-success bg-success/10 hover:bg-success/20'
-                        : quest.unlocked
-                          ? 'border-gold bg-gold/10 hover:bg-gold/20 animate-pulse'
-                          : 'border-text-muted/30 bg-surface-panel/50 opacity-50 cursor-not-allowed'
-                    }`}
-                  >
-                    {isLast ? (
-                      <span className="text-3xl">👑</span>
-                    ) : (
-                      <span className="text-2xl font-bold text-gold">
-                        {quest.order}
-                      </span>
-                    )}
-                    <span className="text-xs text-center px-1 text-text-primary leading-tight">
-                      {quest.title.split('—')[0].trim()}
+              const node = (
+                <button
+                  key={quest.id}
+                  onClick={() => {
+                    if (quest.unlocked || quest.completed) {
+                      navigate(`/quest/${quest.id}`)
+                    }
+                  }}
+                  disabled={!quest.unlocked && !quest.completed}
+                  className={`w-36 h-36 rounded-xl flex flex-col items-center justify-center gap-1 border-2 transition-all cursor-pointer ${
+                    quest.completed
+                      ? 'border-success bg-success/10 hover:bg-success/20'
+                      : quest.unlocked
+                        ? 'border-gold bg-gold/10 hover:bg-gold/20 animate-pulse'
+                        : 'border-text-muted/30 bg-surface-panel/50 opacity-50 cursor-not-allowed'
+                  }`}
+                >
+                  {isLast ? (
+                    <span className="text-3xl">👑</span>
+                  ) : (
+                    <span className="text-2xl font-bold text-gold">
+                      {quest.order}
                     </span>
-                    <span className="text-xs text-text-muted">
-                      {quest.xp_reward} XP
-                    </span>
-                    {quest.completed && (
-                      <span className="text-success text-lg">✓</span>
-                    )}
-                    {quest.unlocked && !quest.completed && (
-                      <span className="text-gold text-xs">Ready</span>
-                    )}
-                  </button>
-
-                  {/* Connector line */}
-                  {i < arr.length - 1 && (
-                    <div
-                      className={`w-8 h-0.5 self-center shrink-0 ${
-                        quest.completed ? 'bg-success' : 'bg-text-muted/30'
-                      }`}
-                    />
                   )}
-                </div>
+                  <span className="text-xs text-center px-1 text-text-primary leading-tight">
+                    {quest.title.split('—')[0].trim()}
+                  </span>
+                  <span className="text-xs text-text-muted">
+                    {quest.xp_reward} XP
+                  </span>
+                  {quest.completed && (
+                    <span className="text-success text-lg">✓</span>
+                  )}
+                  {quest.unlocked && !quest.completed && (
+                    <span className="text-gold text-xs">Ready</span>
+                  )}
+                </button>
               )
+              if (i >= arr.length - 1) return [node]
+              return [
+                node,
+                <div
+                  key={`c1-${i}`}
+                  className={`w-8 h-0.5 mx-2 shrink-0 ${
+                    quest.completed ? 'bg-success' : 'bg-text-muted/30'
+                  }`}
+                />,
+              ]
             })}
           </div>
         </div>
@@ -103,57 +103,59 @@ export function QuestMapPage() {
               第二篇章：魔法阵构筑 — FastAPI
             </h2>
             <div className="max-w-3xl mx-auto">
-              <div className="flex flex-wrap justify-center gap-4">
+              <div className="flex flex-wrap justify-center items-center gap-0">
                 {quests
                   .filter((q) => q.phase === 2)
-                  .map((quest, i, arr) => {
+                  .flatMap((quest, i, arr) => {
                     const isLast = quest.order === 18
-                    return (
-                      <div key={quest.id} className="flex items-center">
-                        <button
-                          onClick={() => {
-                            if (quest.unlocked || quest.completed) {
-                              navigate(`/quest/${quest.id}`)
-                            }
-                          }}
-                          disabled={!quest.unlocked && !quest.completed}
-                          className={`w-36 h-36 rounded-xl flex flex-col items-center justify-center gap-1 border-2 transition-all cursor-pointer ${
-                            quest.completed
-                              ? 'border-success bg-success/10 hover:bg-success/20'
-                              : quest.unlocked
-                                ? 'border-gold bg-gold/10 hover:bg-gold/20 animate-pulse'
-                                : 'border-text-muted/30 bg-surface-panel/50 opacity-50 cursor-not-allowed'
-                          }`}
-                        >
-                          {isLast ? (
-                            <span className="text-3xl">👑</span>
-                          ) : (
-                            <span className="text-2xl font-bold text-gold">
-                              {quest.order}
-                            </span>
-                          )}
-                          <span className="text-xs text-center px-1 text-text-primary leading-tight">
-                            {quest.title.split('—')[0].trim()}
+                    const node = (
+                      <button
+                        key={quest.id}
+                        onClick={() => {
+                          if (quest.unlocked || quest.completed) {
+                            navigate(`/quest/${quest.id}`)
+                          }
+                        }}
+                        disabled={!quest.unlocked && !quest.completed}
+                        className={`w-36 h-36 rounded-xl flex flex-col items-center justify-center gap-1 border-2 transition-all cursor-pointer ${
+                          quest.completed
+                            ? 'border-success bg-success/10 hover:bg-success/20'
+                            : quest.unlocked
+                              ? 'border-gold bg-gold/10 hover:bg-gold/20 animate-pulse'
+                              : 'border-text-muted/30 bg-surface-panel/50 opacity-50 cursor-not-allowed'
+                        }`}
+                      >
+                        {isLast ? (
+                          <span className="text-3xl">👑</span>
+                        ) : (
+                          <span className="text-2xl font-bold text-gold">
+                            {quest.order}
                           </span>
-                          <span className="text-xs text-text-muted">
-                            {quest.xp_reward} XP
-                          </span>
-                          {quest.completed && (
-                            <span className="text-success text-lg">✓</span>
-                          )}
-                          {quest.unlocked && !quest.completed && (
-                            <span className="text-gold text-xs">Ready</span>
-                          )}
-                        </button>
-                        {i < arr.length - 1 && (
-                          <div
-                            className={`w-8 h-0.5 -ml-1 -mr-1 ${
-                              quest.completed ? 'bg-success' : 'bg-text-muted/30'
-                            }`}
-                          />
                         )}
-                      </div>
+                        <span className="text-xs text-center px-1 text-text-primary leading-tight">
+                          {quest.title.split('—')[0].trim()}
+                        </span>
+                        <span className="text-xs text-text-muted">
+                          {quest.xp_reward} XP
+                        </span>
+                        {quest.completed && (
+                          <span className="text-success text-lg">✓</span>
+                        )}
+                        {quest.unlocked && !quest.completed && (
+                          <span className="text-gold text-xs">Ready</span>
+                        )}
+                      </button>
                     )
+                    if (i >= arr.length - 1) return [node]
+                    return [
+                      node,
+                      <div
+                        key={`c2-${i}`}
+                        className={`w-8 h-0.5 mx-2 shrink-0 ${
+                          quest.completed ? 'bg-success' : 'bg-text-muted/30'
+                        }`}
+                      />,
+                    ]
                   })}
               </div>
             </div>
@@ -167,57 +169,59 @@ export function QuestMapPage() {
               第三篇章：神器锻造 — 全栈实战
             </h2>
             <div className="max-w-3xl mx-auto">
-              <div className="flex flex-wrap justify-center gap-4">
+              <div className="flex flex-wrap justify-center items-center gap-0">
                 {quests
                   .filter((q) => q.phase === 3)
-                  .map((quest, i, arr) => {
+                  .flatMap((quest, i, arr) => {
                     const isLast = quest.order === 25
-                    return (
-                      <div key={quest.id} className="flex items-center">
-                        <button
-                          onClick={() => {
-                            if (quest.unlocked || quest.completed) {
-                              navigate(`/quest/${quest.id}`)
-                            }
-                          }}
-                          disabled={!quest.unlocked && !quest.completed}
-                          className={`w-36 h-36 rounded-xl flex flex-col items-center justify-center gap-1 border-2 transition-all cursor-pointer ${
-                            quest.completed
-                              ? 'border-success bg-success/10 hover:bg-success/20'
-                              : quest.unlocked
-                                ? 'border-gold bg-gold/10 hover:bg-gold/20 animate-pulse'
-                                : 'border-text-muted/30 bg-surface-panel/50 opacity-50 cursor-not-allowed'
-                          }`}
-                        >
-                          {isLast ? (
-                            <span className="text-3xl">👑</span>
-                          ) : (
-                            <span className="text-2xl font-bold text-gold">
-                              {quest.order}
-                            </span>
-                          )}
-                          <span className="text-xs text-center px-1 text-text-primary leading-tight">
-                            {quest.title.split('—')[0].trim()}
+                    const node = (
+                      <button
+                        key={quest.id}
+                        onClick={() => {
+                          if (quest.unlocked || quest.completed) {
+                            navigate(`/quest/${quest.id}`)
+                          }
+                        }}
+                        disabled={!quest.unlocked && !quest.completed}
+                        className={`w-36 h-36 rounded-xl flex flex-col items-center justify-center gap-1 border-2 transition-all cursor-pointer ${
+                          quest.completed
+                            ? 'border-success bg-success/10 hover:bg-success/20'
+                            : quest.unlocked
+                              ? 'border-gold bg-gold/10 hover:bg-gold/20 animate-pulse'
+                              : 'border-text-muted/30 bg-surface-panel/50 opacity-50 cursor-not-allowed'
+                        }`}
+                      >
+                        {isLast ? (
+                          <span className="text-3xl">👑</span>
+                        ) : (
+                          <span className="text-2xl font-bold text-gold">
+                            {quest.order}
                           </span>
-                          <span className="text-xs text-text-muted">
-                            {quest.xp_reward} XP
-                          </span>
-                          {quest.completed && (
-                            <span className="text-success text-lg">✓</span>
-                          )}
-                          {quest.unlocked && !quest.completed && (
-                            <span className="text-gold text-xs">Ready</span>
-                          )}
-                        </button>
-                        {i < arr.length - 1 && (
-                          <div
-                            className={`w-8 h-0.5 -ml-1 -mr-1 ${
-                              quest.completed ? 'bg-success' : 'bg-text-muted/30'
-                            }`}
-                          />
                         )}
-                      </div>
+                        <span className="text-xs text-center px-1 text-text-primary leading-tight">
+                          {quest.title.split('—')[0].trim()}
+                        </span>
+                        <span className="text-xs text-text-muted">
+                          {quest.xp_reward} XP
+                        </span>
+                        {quest.completed && (
+                          <span className="text-success text-lg">✓</span>
+                        )}
+                        {quest.unlocked && !quest.completed && (
+                          <span className="text-gold text-xs">Ready</span>
+                        )}
+                      </button>
                     )
+                    if (i >= arr.length - 1) return [node]
+                    return [
+                      node,
+                      <div
+                        key={`c3-${i}`}
+                        className={`w-8 h-0.5 mx-2 shrink-0 ${
+                          quest.completed ? 'bg-success' : 'bg-text-muted/30'
+                        }`}
+                      />,
+                    ]
                   })}
               </div>
             </div>
