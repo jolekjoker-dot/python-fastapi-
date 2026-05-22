@@ -37,6 +37,10 @@ if not exist "frontend\node_modules" (
     cd ..
 )
 
+echo [INFO] Freeing up ports...
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":8000.*LISTENING"') do taskkill /f /pid %%a >nul 2>&1
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":5174.*LISTENING"') do taskkill /f /pid %%a >nul 2>&1
+
 echo.
 echo [INFO] Starting backend on port 8000...
 start "Backend" /min cmd /c "cd /d %ROOT% && set PYTHONPATH=%ROOT% && venv\Scripts\python -m uvicorn backend.main:app --port 8000"
