@@ -6,6 +6,9 @@ import { LoginPage } from './pages/LoginPage'
 import { PlaygroundPage } from './pages/PlaygroundPage'
 import { QuestMapPage } from './pages/QuestMapPage'
 import { QuestDetailPage } from './pages/QuestDetailPage'
+import { AchievementsPage } from './pages/AchievementsPage'
+import { ShopPage } from './pages/ShopPage'
+import { LeaderboardPage } from './pages/LeaderboardPage'
 
 export default function App() {
   const { user, restore, loading } = useUserStore()
@@ -30,6 +33,9 @@ export default function App() {
         <Route path="/map" element={user ? <QuestMapPage /> : <Navigate to="/" />} />
         <Route path="/quest/:questId" element={user ? <QuestDetailPage /> : <Navigate to="/" />} />
         <Route path="/playground" element={user ? <PlaygroundPage /> : <Navigate to="/" />} />
+        <Route path="/achievements" element={user ? <AchievementsPage /> : <Navigate to="/" />} />
+        <Route path="/shop" element={user ? <ShopPage /> : <Navigate to="/" />} />
+        <Route path="/leaderboard" element={user ? <LeaderboardPage /> : <Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
   )

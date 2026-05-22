@@ -2,7 +2,9 @@
 
 | # | Commit | Date | Message |
 |---|--------|------|---------|
-| 11 | `16978ea` | 2026-05-22 | **feat**: phase 3 — 7 关全栈实战 (SQLAlchemy/JWT/React/API Client/Prism.js/游戏化 API/Docker) |
+| 13 | `8014429` | 2026-05-22 | **fix**: 关卡地图增加第三篇章显示 |
+| 12 | `1e61ff0` | 2026-05-22 | **docs**: update CHANGELOG for phase 2+3 |
+| 11 | `16978ea` | 2026-05-22 | **feat**: phase 3 — 7 关全栈实战 |
 | 10 | `81e71c9` | 2026-05-22 | **feat**: phase 2 — 8 关 FastAPI 课程 + 临时服务器执行引擎 |
 | 9 | `acacde8` | 2026-05-22 | **docs**: update CHANGELOG |
 | 8 | `f9e9069` | 2026-05-22 | **feat**: 面板宽度响应式 — 基于窗口百分比缩放 |

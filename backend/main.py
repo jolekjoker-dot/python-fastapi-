@@ -7,7 +7,7 @@ from backend.database import init_db
 from backend.models import (
     CodeDraft, ExecutionHistory, Progress, User, UserPreference  # noqa: F401
 )
-from backend.routers import auth, execute, persistence, quests
+from backend.routers import auth, execute, game, persistence, quests
 
 
 @asynccontextmanager
@@ -35,6 +35,7 @@ app.include_router(auth.router)
 app.include_router(execute.router)
 app.include_router(quests.router)
 app.include_router(persistence.router)
+app.include_router(game.router)
 
 
 @app.get("/")

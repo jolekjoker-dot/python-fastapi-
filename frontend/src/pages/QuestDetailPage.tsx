@@ -8,7 +8,9 @@ import { ResizeHandle } from '../components/ui/ResizeHandle'
 import { usePanelResize } from '../hooks/usePanelResize'
 import { useWindowSize } from '../hooks/useWindowSize'
 import { getDraft, saveDraft, getHistory, savePreference } from '../api/persistence'
+import { checkAchievements } from '../api/game'
 import type { ExecutionRecord } from '../api/persistence'
+import { Confetti } from '../components/gamification/Confetti'
 import ReactMarkdown from 'react-markdown'
 import toast from 'react-hot-toast'
 import { useUserStore } from '../stores/userStore'
@@ -25,6 +27,7 @@ export function QuestDetailPage() {
   const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set())
   const [rightTab, setRightTab] = useState<'result' | 'history'>('result')
   const [history, setHistory] = useState<ExecutionRecord[]>([])
+  const [showConfetti, setShowConfetti] = useState(false)
   const { user } = useUserStore()
 
   // Debounce timer for auto-save
@@ -129,6 +132,9 @@ export function QuestDetailPage() {
 
         if (newCompleted.size >= allTasks.length) {
           toast.success(`通关！获得 ${quest.xp_reward} XP！`, { duration: 4000 })
+          setShowConfetti(true)
+          setTimeout(() => setShowConfetti(false), 3000)
+          checkAchievements().catch(() => {})
           setTimeout(() => {
             useUserStore.getState().restore()
           }, 1500)
@@ -397,6 +403,7 @@ export function QuestDetailPage() {
           </div>
         </div>
       </div>
+      <Confetti active={showConfetti} />
     </div>
   )
 }
