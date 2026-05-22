@@ -159,6 +159,70 @@ export function QuestMapPage() {
             </div>
           </div>
         )}
+
+        {/* Phase 3 */}
+        {quests.filter((q) => q.phase === 3).length > 0 && (
+          <div className="mt-12">
+            <h2 className="text-xl text-center text-text-muted mb-4">
+              第三篇章：神器锻造 — 全栈实战
+            </h2>
+            <div className="max-w-3xl mx-auto">
+              <div className="flex flex-wrap justify-center gap-4">
+                {quests
+                  .filter((q) => q.phase === 3)
+                  .map((quest, i, arr) => {
+                    const isLast = quest.order === 25
+                    return (
+                      <div key={quest.id} className="flex items-center">
+                        <button
+                          onClick={() => {
+                            if (quest.unlocked || quest.completed) {
+                              navigate(`/quest/${quest.id}`)
+                            }
+                          }}
+                          disabled={!quest.unlocked && !quest.completed}
+                          className={`w-36 h-36 rounded-xl flex flex-col items-center justify-center gap-1 border-2 transition-all cursor-pointer ${
+                            quest.completed
+                              ? 'border-success bg-success/10 hover:bg-success/20'
+                              : quest.unlocked
+                                ? 'border-gold bg-gold/10 hover:bg-gold/20 animate-pulse'
+                                : 'border-text-muted/30 bg-surface-panel/50 opacity-50 cursor-not-allowed'
+                          }`}
+                        >
+                          {isLast ? (
+                            <span className="text-3xl">👑</span>
+                          ) : (
+                            <span className="text-2xl font-bold text-gold">
+                              {quest.order}
+                            </span>
+                          )}
+                          <span className="text-xs text-center px-1 text-text-primary leading-tight">
+                            {quest.title.split('—')[0].trim()}
+                          </span>
+                          <span className="text-xs text-text-muted">
+                            {quest.xp_reward} XP
+                          </span>
+                          {quest.completed && (
+                            <span className="text-success text-lg">✓</span>
+                          )}
+                          {quest.unlocked && !quest.completed && (
+                            <span className="text-gold text-xs">Ready</span>
+                          )}
+                        </button>
+                        {i < arr.length - 1 && (
+                          <div
+                            className={`w-8 h-0.5 -ml-1 -mr-1 ${
+                              quest.completed ? 'bg-success' : 'bg-text-muted/30'
+                            }`}
+                          />
+                        )}
+                      </div>
+                    )
+                  })}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
