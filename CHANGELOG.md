@@ -2,6 +2,8 @@
 
 | # | Commit | Date | Message |
 |---|--------|------|---------|
+| 11 | `16978ea` | 2026-05-22 | **feat**: phase 3 — 7 关全栈实战 (SQLAlchemy/JWT/React/API Client/Prism.js/游戏化 API/Docker) |
+| 10 | `81e71c9` | 2026-05-22 | **feat**: phase 2 — 8 关 FastAPI 课程 + 临时服务器执行引擎 |
 | 9 | `acacde8` | 2026-05-22 | **docs**: update CHANGELOG |
 | 8 | `f9e9069` | 2026-05-22 | **feat**: 面板宽度响应式 — 基于窗口百分比缩放 |
 | 7 | `ac7c2b5` | 2026-05-22 | **feat**: 数据持久化 — 运行历史、代码草稿、面板宽度全部存入 SQLite，右侧面板新增 History Tab |
