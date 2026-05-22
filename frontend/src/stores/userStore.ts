@@ -11,10 +11,12 @@ interface UserState {
   logout: () => void
 }
 
+const hasToken = !!localStorage.getItem('token')
+
 export const useUserStore = create<UserState>((set) => ({
   user: null,
   token: localStorage.getItem('token'),
-  loading: false,
+  loading: hasToken,
 
   login: async (username: string) => {
     set({ loading: true })
@@ -25,13 +27,16 @@ export const useUserStore = create<UserState>((set) => ({
 
   restore: async () => {
     const token = localStorage.getItem('token')
-    if (!token) return
+    if (!token) {
+      set({ loading: false })
+      return
+    }
     try {
       const user = await getMe()
-      set({ user, token })
+      set({ user, token, loading: false })
     } catch {
       localStorage.removeItem('token')
-      set({ user: null, token: null })
+      set({ user: null, token: null, loading: false })
     }
   },
 
