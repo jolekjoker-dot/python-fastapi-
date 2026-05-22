@@ -42,7 +42,7 @@ export function QuestMapPage() {
         {/* Quest nodes */}
         <div className="max-w-3xl mx-auto">
           <div className="flex flex-wrap justify-center gap-4">
-            {phase1.map((quest, i) => {
+            {phase1.map((quest, i, arr) => {
               const isLast = quest.order === 10
               return (
                 <div key={quest.id} className="flex items-center">
@@ -83,9 +83,9 @@ export function QuestMapPage() {
                   </button>
 
                   {/* Connector line */}
-                  {i < phase1.length - 1 && (
+                  {i < arr.length - 1 && (
                     <div
-                      className={`w-8 h-0.5 -ml-1 -mr-1 ${
+                      className={`w-8 h-0.5 self-center shrink-0 ${
                         quest.completed ? 'bg-success' : 'bg-text-muted/30'
                       }`}
                     />
