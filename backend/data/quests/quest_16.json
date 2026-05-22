@@ -1,0 +1,133 @@
+{
+  "id": "quest_16",
+  "title": "Todo 神殿 — CRUD 实战（下）",
+  "phase": 2,
+  "order": 16,
+  "xp_reward": 200,
+  "coin_reward": 80,
+  "story": "> *Todo 神殿的上半部分已经修复。派森大师指向墙壁更深处的卷轴。*\n\n**派森大师**：「创建和查阅只是开始。真正的管理系统还需要**更新**和**删除**。PUT 修改整个资源，DELETE 移除它。让 Todo 神殿完全恢复运转吧。」",
+  "content": "## Todo API — PUT 更新与 DELETE 删除\n\n### PUT — 完整更新\n```python\n@app.put(\"/todos/{todo_id}\")\nasync def update_todo(todo_id: int, todo: TodoCreate):\n    if todo_id not in todos:\n        raise HTTPException(404, detail=\"不存在\")\n    todos[todo_id][\"title\"] = todo.title\n    todos[todo_id][\"priority\"] = todo.priority\n    return todos[todo_id]\n```\n\n### DELETE — 删除\n```python\n@app.delete(\"/todos/{todo_id}\", status_code=204)\nasync def delete_todo(todo_id: int):\n    if todo_id not in todos:\n        raise HTTPException(404, detail=\"不存在\")\n    del todos[todo_id]\n    return None\n```\n\n### PATCH — 部分更新\n```python\n@app.patch(\"/todos/{todo_id}/complete\")\nasync def complete_todo(todo_id: int):\n    if todo_id not in todos:\n        raise HTTPException(404)\n    todos[todo_id][\"completed\"] = True\n    return todos[todo_id]\n```",
+  "tasks": [
+    {
+      "id": "task_16_01",
+      "order": 1,
+      "description": "### 任务一：PUT 更新\n\n在上一个关卡代码基础上，添加 `PUT /todos/{todo_id}` 路由。\n\n先 POST 创建一条 todo（title=\"旧任务\"），再用 PUT /todos/1 更新为 `{\"title\": \"新任务\", \"priority\": \"high\"}`。\n\n**要求**：PUT 返回更新后的数据。",
+      "starter_code": "from fastapi import FastAPI, HTTPException\nfrom pydantic import BaseModel\nfrom datetime import datetime\n\napp = FastAPI()\ntodos = {}\nnext_id = 1\n\nclass TodoCreate(BaseModel):\n    title: str\n    priority: str = \"medium\"\n\n@app.post(\"/todos\", status_code=201)\nasync def create(todo: TodoCreate):\n    global next_id\n    todos[next_id] = {\"id\": next_id, \"title\": todo.title, \"priority\": todo.priority, \"created_at\": str(datetime.now())}\n    next_id += 1\n    return todos[next_id - 1]\n\n@app.get(\"/todos\")\nasync def get_all():\n    return list(todos.values())\n\n# 添加 PUT /todos/{todo_id}\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "POST",
+          "path": "/todos",
+          "expected_status": 201,
+          "expected_body_contains": "旧任务",
+          "body": {"title": "旧任务", "priority": "low"},
+          "description": "先创建一条"
+        },
+        {
+          "type": "http_test",
+          "method": "PUT",
+          "path": "/todos/1",
+          "expected_status": 200,
+          "expected_body_contains": "新任务",
+          "body": {"title": "新任务", "priority": "high"},
+          "description": "更新为新任务"
+        }
+      ],
+      "hints": [
+        "@app.put(\"/todos/{todo_id}\")",
+        "if todo_id not in todos: raise HTTPException(404, detail=\"不存在\")",
+        "修改后 return todos[todo_id]"
+      ]
+    },
+    {
+      "id": "task_16_02",
+      "order": 2,
+      "description": "### 任务二：DELETE 删除\n\n添加 `DELETE /todos/{todo_id}` 路由（status_code=204）。\n\n先 POST 创建一条，再用 DELETE 删除，然后用 GET 验证列表为空。\n\n**要求**：DELETE /todos/1 返回 204，GET 验证列表为空。",
+      "starter_code": "from fastapi import FastAPI, HTTPException\nfrom pydantic import BaseModel\nfrom datetime import datetime\n\napp = FastAPI()\ntodos = {}\nnext_id = 1\n\nclass TodoCreate(BaseModel):\n    title: str\n    priority: str = \"medium\"\n\n@app.post(\"/todos\", status_code=201)\nasync def create(todo: TodoCreate):\n    global next_id\n    todos[next_id] = {\"id\": next_id, \"title\": todo.title, \"priority\": todo.priority, \"created_at\": str(datetime.now())}\n    next_id += 1\n    return todos[next_id - 1]\n\n@app.get(\"/todos\")\nasync def get_all():\n    return list(todos.values())\n\n# 添加 DELETE /todos/{todo_id}\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "POST",
+          "path": "/todos",
+          "expected_status": 201,
+          "expected_body_contains": "待删除",
+          "body": {"title": "待删除", "priority": "medium"},
+          "description": "创建待删除项"
+        },
+        {
+          "type": "http_test",
+          "method": "DELETE",
+          "path": "/todos/1",
+          "expected_status": 204,
+          "expected_body_contains": "",
+          "description": "删除返回 204"
+        },
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/todos",
+          "expected_status": 200,
+          "expected_body_contains": "[]",
+          "description": "验证列表为空"
+        }
+      ],
+      "hints": [
+        "@app.delete(\"/todos/{todo_id}\", status_code=204)",
+        "del todos[todo_id]",
+        "return None 表示 204 No Content"
+      ]
+    },
+    {
+      "id": "task_16_03",
+      "order": 3,
+      "description": "### 任务三：PATCH 部分更新\n\n添加 `PATCH /todos/{todo_id}/complete` 路由，将 todo 标记为完成。\n\n先 POST 创建，再 PATCH 标记为完成，GET 验证 `completed` 字段为 True。\n\n**要求**：PATCH 返回的数据包含 `\"completed\": true`。",
+      "starter_code": "from fastapi import FastAPI, HTTPException\nfrom pydantic import BaseModel\nfrom datetime import datetime\n\napp = FastAPI()\ntodos = {}\nnext_id = 1\n\nclass TodoCreate(BaseModel):\n    title: str\n    priority: str = \"medium\"\n\n@app.post(\"/todos\", status_code=201)\nasync def create(todo: TodoCreate):\n    global next_id\n    todos[next_id] = {\"id\": next_id, \"title\": todo.title, \"priority\": todo.priority, \"created_at\": str(datetime.now()), \"completed\": False}\n    next_id += 1\n    return todos[next_id - 1]\n\n@app.get(\"/todos/{todo_id}\")\nasync def get_one(todo_id: int):\n    if todo_id not in todos:\n        raise HTTPException(404, detail=\"不存在\")\n    return todos[todo_id]\n\n# 添加 PATCH /todos/{todo_id}/complete\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "POST",
+          "path": "/todos",
+          "expected_status": 201,
+          "expected_body_contains": "标记完成",
+          "body": {"title": "标记完成", "priority": "high"},
+          "description": "先创建"
+        },
+        {
+          "type": "http_test",
+          "method": "PATCH",
+          "path": "/todos/1/complete",
+          "expected_status": 200,
+          "expected_body_contains": "\"completed\": true",
+          "description": "标记完成"
+        }
+      ],
+      "hints": [
+        "@app.patch(\"/todos/{todo_id}/complete\")",
+        "todos[todo_id][\"completed\"] = True",
+        "return todos[todo_id]"
+      ]
+    }
+  ],
+  "challenge": {
+    "id": "challenge_16",
+    "order": 99,
+    "description": "### 挑战题：批量操作\n\n添加 `POST /todos/batch` 路由，接收 `list[TodoCreate]`，批量创建并返回创建的所有对象。\n\n测试用数组 POST 两个 todo。\n\n**要求**：返回数组包含两个对象。",
+    "starter_code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\nfrom datetime import datetime\n\napp = FastAPI()\ntodos = {}\nnext_id = 1\n\nclass TodoCreate(BaseModel):\n    title: str\n    priority: str = \"medium\"\n\n# 添加 POST /todos/batch\n",
+    "test_cases": [
+      {
+        "type": "http_test",
+        "method": "POST",
+        "path": "/todos/batch",
+        "expected_status": 201,
+        "expected_body_contains": "\"id\":2",
+        "body": [{"title": "批量1", "priority": "high"}, {"title": "批量2", "priority": "low"}],
+        "description": "批量创建两条"
+      }
+    ],
+    "hints": [
+      "async def create_batch(todos_input: list[TodoCreate]):",
+      "遍历 todos_input，逐个创建",
+      "返回所有创建的对象列表"
+    ]
+  }
+}

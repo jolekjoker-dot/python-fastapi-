@@ -1,0 +1,111 @@
+{
+  "id": "quest_13",
+  "title": "阵之应 — 响应与错误处理",
+  "phase": 2,
+  "order": 13,
+  "xp_reward": 160,
+  "coin_reward": 60,
+  "story": "> *魔法阵中的纹路不仅接收魔力，还会发出回应之光。*\n\n**派森大师**：「你的魔法阵要优雅地回应每一个请求。200 是成功之光，404 是'未找到'的信号，422 是'请求无效'的警告。`response_model` 控制回应的形状，`HTTPException` 发出错误信号。」",
+  "content": "## 响应与错误处理\n\n### 状态码\n```python\n@app.post(\"/items\", status_code=201)\nasync def create_item(item: Item):\n    return item\n```\n常见状态码：200 OK、201 Created、204 No Content、400 Bad Request、404 Not Found。\n\n### response_model — 过滤返回字段\n```python\nclass ItemResponse(BaseModel):\n    name: str\n    # price 字段不返回给客户端\n\n@app.get(\"/items/{id}\", response_model=ItemResponse)\nasync def get_item(id: int):\n    return {\"name\": \"xxx\", \"price\": 100, \"_internal\": \"secret\"}\n    # 只返回 name，price 和 _internal 被过滤\n```\n\n### HTTPException — 返回错误\n```python\nfrom fastapi import HTTPException\n\n@app.get(\"/items/{id}\")\nasync def get_item(id: int):\n    if id not in items:\n        raise HTTPException(status_code=404, detail=\"物品不存在\")\n    return items[id]\n```",
+  "tasks": [
+    {
+      "id": "task_13_01",
+      "order": 1,
+      "description": "### 任务一：自定义状态码\n\n创建 `POST /create` 路由，使用 `status_code=201` 返回创建成功消息。\n\n访问 `POST /create` 应返回状态码 201 和 `{\"status\": \"created\"}`。\n\n**要求**：状态码为 201。",
+      "starter_code": "from fastapi import FastAPI\n\napp = FastAPI()\n\n# 添加 POST /create，状态码 201\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "POST",
+          "path": "/create",
+          "expected_status": 201,
+          "expected_body_contains": "created",
+          "description": "状态码应为 201"
+        }
+      ],
+      "hints": [
+        "@app.post(\"/create\", status_code=201)",
+        "return {\"status\": \"created\"}"
+      ]
+    },
+    {
+      "id": "task_13_02",
+      "order": 2,
+      "description": "### 任务二：404 错误处理\n\n创建一个字典 `items = {1: \"魔杖\", 2: \"药水\"}`，然后创建路由 `GET /items/{item_id}`：\n- 如果 item_id 存在，返回 `{\"name\": \"xxx\"}`\n- 如果不存在，抛出 `HTTPException(status_code=404, detail=\"物品不存在\")`\n\n测试访问 `/items/1` 应返回魔杖，访问 `/items/99` 应返回 404。\n\n**要求**：`/items/1` 返回 200。",
+      "starter_code": "from fastapi import FastAPI, HTTPException\n\napp = FastAPI()\n\nitems = {1: \"魔杖\", 2: \"药水\"}\n\n# 添加 GET /items/{item_id}\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/items/1",
+          "expected_status": 200,
+          "expected_body_contains": "魔杖",
+          "description": "/items/1 返回魔杖"
+        },
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/items/99",
+          "expected_status": 404,
+          "expected_body_contains": "",
+          "description": "/items/99 返回 404"
+        }
+      ],
+      "hints": [
+        "if item_id not in items: raise HTTPException(404, detail=\"物品不存在\")",
+        "return {\"name\": items[item_id]}",
+        "别忘了 from fastapi import HTTPException"
+      ]
+    },
+    {
+      "id": "task_13_03",
+      "order": 3,
+      "description": "### 任务三：response_model 过滤\n\n定义响应模型 `ItemOut(BaseModel)` 只包含 `name: str`，然后创建路由 `GET /safe/{item_id}` 使用 `response_model=ItemOut`。\n\n即使返回数据中包含额外字段（如 `price`），客户端也只能看到 `name`。\n\n**要求**：`/safe/1` 返回 200，且响应体中**不包含** price。",
+      "starter_code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\n\napp = FastAPI()\n\nclass ItemOut(BaseModel):\n    name: str\n\n# 添加 GET /safe/{item_id}，使用 response_model=ItemOut\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/safe/1",
+          "expected_status": 200,
+          "expected_body_contains": "secret_sword",
+          "description": "response_model 过滤后仍返回 name"
+        }
+      ],
+      "hints": [
+        "@app.get(\"/safe/{item_id}\", response_model=ItemOut)",
+        "return {\"name\": \"secret_sword\", \"price\": 9999}",
+        "客户端只会看到 {\"name\": \"secret_sword\"}"
+      ]
+    }
+  ],
+  "challenge": {
+    "id": "challenge_13",
+    "order": 99,
+    "description": "### 挑战题：完整错误处理\n\n创建 `GET /info/{code}` 路由：\n- code=200 → 返回 `{\"msg\": \"成功\"}` (status 200)\n- code=400 → 抛出 HTTPException 400 \"请求错误\"\n- code=404 → 抛出 HTTPException 404 \"未找到\"\n- code=500 → 抛出 HTTPException 500 \"服务器错误\"\n\n**要求**：`/info/200` 返回 200，`/info/404` 返回 404。",
+    "starter_code": "from fastapi import FastAPI, HTTPException\n\napp = FastAPI()\n\n# 添加 GET /info/{code}\n",
+    "test_cases": [
+      {
+        "type": "http_test",
+        "method": "GET",
+        "path": "/info/200",
+        "expected_status": 200,
+        "expected_body_contains": "成功",
+        "description": "code=200 返回成功"
+      },
+      {
+        "type": "http_test",
+        "method": "GET",
+        "path": "/info/404",
+        "expected_status": 404,
+        "expected_body_contains": "",
+        "description": "code=404 返回 404 错误"
+      }
+    ],
+    "hints": [
+      "if code == 200: return {\"msg\": \"成功\"}",
+      "elif code == 404: raise HTTPException(404, detail=\"未找到\")",
+      "用 if/elif/else 覆盖所有情况"
+    ]
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "id": "quest_12",
+  "title": "阵之分 — 路由与请求处理",
+  "phase": 2,
+  "order": 12,
+  "xp_reward": 180,
+  "coin_reward": 70,
+  "story": "> *派森大师用手指沿着魔法阵的纹路描画。每条纹路都发出不同颜色的光。*\n\n**派森大师**：「魔法阵上的每条纹路都是一种**路由**——`/users`、`/items/{id}`、`/search?q=xxx`……它们决定了请求流向何方。`GET`、`POST`、`PUT`、`DELETE` 是四种基础魔法手势，对应查、增、改、删。」",
+  "content": "## 路由与请求处理\n\n### 路径参数\n```python\n@app.get(\"/users/{user_id}\")\nasync def get_user(user_id: int):\n    return {\"user_id\": user_id}\n```\nFastAPI 自动将路径中的字符串转为 `int`。\n\n### 查询参数\n函数签名中不在路径中的参数自动成为查询参数：\n```python\n@app.get(\"/search\")\nasync def search(q: str = \"\", limit: int = 10):\n    return {\"query\": q, \"limit\": limit}\n```\n访问：`/search?q=fastapi&limit=5`\n\n### 请求体 (POST/PUT)\n用 Pydantic 模型定义请求体：\n```python\nfrom pydantic import BaseModel\n\nclass Item(BaseModel):\n    name: str\n    price: float\n\n@app.post(\"/items\")\nasync def create_item(item: Item):\n    return {\"name\": item.name, \"price\": item.price}\n```\n\n### 多种 HTTP 方法\n同一个路径可以用不同方法：\n- `@app.get(\"/items\")` — 获取\n- `@app.post(\"/items\")` — 创建\n- `@app.put(\"/items/{id}\")` — 更新\n- `@app.delete(\"/items/{id}\")` — 删除",
+  "tasks": [
+    {
+      "id": "task_12_01",
+      "order": 1,
+      "description": "### 任务一：类型化的路径参数\n\n创建路由 `/square/{number}`，接收一个整数参数，返回它的平方。\n\n访问 `/square/5` 应返回 `{\"result\": 25}`。\n\n**要求**：返回 `{\"result\": 25}`",
+      "starter_code": "from fastapi import FastAPI\n\napp = FastAPI()\n\n# 添加 /square/{number} 路由\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/square/5",
+          "expected_status": 200,
+          "expected_body_contains": "\"result\":25",
+          "description": "/square/5 返回 25"
+        }
+      ],
+      "hints": [
+        "@app.get(\"/square/{number}\")",
+        "参数类型: number: int",
+        "return {\"result\": number ** 2}"
+      ]
+    },
+    {
+      "id": "task_12_02",
+      "order": 2,
+      "description": "### 任务二：搜索过滤\n\n创建路由 `/filter`，接受查询参数：\n- `min_price: float = 0`（最低价格）\n- `max_price: float = 100`（最高价格）\n\n访问 `/filter?min_price=10&max_price=50` 应返回 `{\"min\": 10.0, \"max\": 50.0}`。\n\n**要求**：返回 JSON 包含正确的 min 和 max 值。",
+      "starter_code": "from fastapi import FastAPI\n\napp = FastAPI()\n\n# 添加 /filter 路由\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/filter?min_price=10&max_price=50",
+          "expected_status": 200,
+          "expected_body_contains": "\"min\":10",
+          "description": "查询参数正确解析"
+        }
+      ],
+      "hints": [
+        "def filter_items(min_price: float = 0, max_price: float = 100):",
+        "FastAPI 自动将查询参数转为 float 类型",
+        "return {\"min\": min_price, \"max\": max_price}"
+      ]
+    },
+    {
+      "id": "task_12_03",
+      "order": 3,
+      "description": "### 任务三：POST 请求体\n\n用 Pydantic 模型创建路由 `POST /spells`，接收咒语信息：\n```python\nclass Spell(BaseModel):\n    name: str\n    power: int\n```\n\n请求体示例：`{\"name\": \"火球术\", \"power\": 80}`\n\n返回 `{\"created\": \"火球术\", \"power\": 80}`。测试会用 POST 发送 `{\"name\": \"火球术\", \"power\": 80}`。\n\n**要求**：返回的 JSON 包含火球术和 80。",
+      "starter_code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\n\napp = FastAPI()\n\nclass Spell(BaseModel):\n    name: str\n    power: int\n\n# 添加 POST /spells 路由\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "POST",
+          "path": "/spells",
+          "expected_status": 200,
+          "expected_body_contains": "火球术",
+          "body": {"name": "火球术", "power": 80},
+          "description": "POST 请求体正确解析"
+        }
+      ],
+      "hints": [
+        "@app.post(\"/spells\")",
+        "async def create_spell(spell: Spell):",
+        "return {\"created\": spell.name, \"power\": spell.power}"
+      ]
+    }
+  ],
+  "challenge": {
+    "id": "challenge_12",
+    "order": 99,
+    "description": "### 挑战题：CRUD 骨架\n\n创建 `/items` 路由，支持 GET 和 POST：\n- `GET /items` → 返回 `{\"items\": []}`\n- `POST /items` → 接收 `{\"name\": \"xxx\"}`，返回 `{\"message\": \"Created xxx\"}`\n\n测试用 GET 验证，然后 POST `{\"name\": \"魔杖\"}` 验证创建。\n\n**要求**：GET 返回空列表，POST 返回包含\"Created 魔杖\"。",
+    "starter_code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\n\napp = FastAPI()\n\nclass ItemCreate(BaseModel):\n    name: str\n\n# GET /items\n\n# POST /items\n",
+    "test_cases": [
+      {
+        "type": "http_test",
+        "method": "GET",
+        "path": "/items",
+        "expected_status": 200,
+        "expected_body_contains": "\"items\":[]",
+        "description": "GET 返回空列表"
+      },
+      {
+        "type": "http_test",
+        "method": "POST",
+        "path": "/items",
+        "expected_status": 200,
+        "expected_body_contains": "Created 魔杖",
+        "body": {"name": "魔杖"},
+        "description": "POST 创建魔杖"
+      }
+    ],
+    "hints": [
+      "GET 返回 {\"items\": []}",
+      "POST 接收 ItemCreate，返回 {\"message\": f\"Created {item.name}\"}",
+      "注意函数名不能重复：get_items / create_item"
+    ]
+  }
+}

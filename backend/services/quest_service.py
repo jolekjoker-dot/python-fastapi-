@@ -93,6 +93,46 @@ def check_task(quest_id: str, submit: TaskSubmit) -> TaskSubmitResult:
     combined_stdout = ""
     combined_stderr = ""
 
+    # FastAPI HTTP tests — use special executor
+    if task.test_cases and task.test_cases[0].type == "http_test":
+        from backend.services.fastapi_executor import execute_fastapi
+
+        http_cases = [
+            {
+                "method": tc.method,
+                "path": tc.path,
+                "expected_status": tc.expected_status,
+                "expected_body_contains": tc.expected_body_contains,
+                "body": tc.body,
+                "description": tc.description,
+            }
+            for tc in task.test_cases
+        ]
+        result = execute_fastapi(submit.code, http_cases)
+        total_time = result.get("execution_time", 0.0)
+        all_passed = result.get("passed", False)
+        stderr = result.get("error", "") or ""
+
+        for tc in result.get("test_results", []):
+            test_results.append(
+                TestResult(
+                    passed=tc.get("passed", False),
+                    description=tc.get("description", ""),
+                    expected=tc.get("expected", ""),
+                    actual=tc.get("actual", ""),
+                    error=tc.get("error"),
+                )
+            )
+
+        return TaskSubmitResult(
+            task_id=submit.task_id,
+            passed=all_passed,
+            test_results=test_results,
+            execution_time=round(total_time, 4),
+            stdout="",
+            stderr=stderr,
+        )
+
     for tc in task.test_cases:
         if tc.input_data is not None:
             wrapper = (

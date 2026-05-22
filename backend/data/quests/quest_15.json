@@ -1,0 +1,140 @@
+{
+  "id": "quest_15",
+  "title": "Todo 神殿 — CRUD 实战（上）",
+  "phase": 2,
+  "order": 15,
+  "xp_reward": 200,
+  "coin_reward": 80,
+  "story": "> *派森大师带你走进一座古老的神殿，墙壁上刻满了待办事项的魔法卷轴。*\n\n**派森大师**：「这里是 Todo 神殿。你将用前面学到的所有魔法阵纹路——路由、请求体、Pydantic 校验——构建一个完整的待办事项管理系统。这次任务分两部分，先完成**创建和查阅**功能。」",
+  "content": "## Todo API — 数据存储与 GET/POST\n\n### 用字典模拟数据库\n```python\nfrom datetime import datetime\n\ntodos: dict[int, dict] = {}\nnext_id = 1\n```\n\n### Pydantic 模型\n```python\nclass TodoCreate(BaseModel):\n    title: str = Field(..., min_length=1, max_length=200)\n    priority: str = \"medium\"\n\nclass TodoResponse(BaseModel):\n    id: int\n    title: str\n    priority: str\n    created_at: str\n```\n\n### GET — 获取列表\n```python\n@app.get(\"/todos\")\nasync def get_todos():\n    return list(todos.values())\n```\n\n### POST — 创建\n```python\n@app.post(\"/todos\", status_code=201)\nasync def create_todo(todo: TodoCreate):\n    global next_id\n    new_todo = {\"id\": next_id, \"title\": todo.title, \"priority\": todo.priority, \"created_at\": str(datetime.now())}\n    todos[next_id] = new_todo\n    next_id += 1\n    return new_todo\n```",
+  "tasks": [
+    {
+      "id": "task_15_01",
+      "order": 1,
+      "description": "### 任务一：搭建 Todo 数据层\n\n创建内存存储：字典 `todos` 和计数器 `next_id`。\n\n创建 `GET /todos` 返回空列表 `[]`。\n\n**要求**：GET /todos 返回 200。",
+      "starter_code": "from fastapi import FastAPI\n\napp = FastAPI()\n\ntodos = {}\nnext_id = 1\n\n# GET /todos\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/todos",
+          "expected_status": 200,
+          "expected_body_contains": "",
+          "description": "GET /todos 返回空列表"
+        }
+      ],
+      "hints": [
+        "@app.get(\"/todos\")",
+        "return list(todos.values())",
+        "空字典返回空列表 []"
+      ]
+    },
+    {
+      "id": "task_15_02",
+      "order": 2,
+      "description": "### 任务二：创建 Todo\n\n定义 `TodoCreate(BaseModel)`：`title: str`，`priority: str = \"medium\"`。\n\n创建 `POST /todos`，接收 TodoCreate，生成 id 和 created_at，存入字典，返回创建的对象。\n\n测试用 `{\"title\": \"学习 FastAPI\", \"priority\": \"high\"}` POST。\n\n**要求**：返回的 JSON 包含 id=1, title, priority。",
+      "starter_code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\nfrom datetime import datetime\n\napp = FastAPI()\n\ntodos = {}\nnext_id = 1\n\nclass TodoCreate(BaseModel):\n    title: str\n    priority: str = \"medium\"\n\n# POST /todos (status_code=201)\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "POST",
+          "path": "/todos",
+          "expected_status": 201,
+          "expected_body_contains": "\"id\":1",
+          "body": {"title": "学习 FastAPI", "priority": "high"},
+          "description": "POST 创建返回 id=1"
+        },
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/todos",
+          "expected_status": 200,
+          "expected_body_contains": "学习 FastAPI",
+          "description": "GET 能看到刚创建的 Todo"
+        }
+      ],
+      "hints": [
+        "@app.post(\"/todos\", status_code=201)",
+        "global next_id 才能修改外部变量",
+        "new_todo = {\"id\": next_id, \"title\": todo.title, \"priority\": todo.priority, \"created_at\": str(datetime.now())}"
+      ]
+    },
+    {
+      "id": "task_15_03",
+      "order": 3,
+      "description": "### 任务三：过滤查询\n\n在 `GET /todos` 中添加查询参数 `priority: str | None = None`，可选过滤。\n\n先创建两条数据（title 不同，priority 不同），让 GET 支持按 priority 过滤。\n\n测试：\n1. `GET /todos` → 返回全部\n2. `GET /todos?priority=high` → 只返回 high 的\n\n**要求**：`GET /todos?priority=high` 只返回包含 \"high\" 的数据。",
+      "starter_code": "from fastapi import FastAPI, Query\nfrom pydantic import BaseModel\nfrom datetime import datetime\n\napp = FastAPI()\n\ntodos = {}\nnext_id = 1\n\nclass TodoCreate(BaseModel):\n    title: str\n    priority: str = \"medium\"\n\n@app.post(\"/todos\", status_code=201)\nasync def create(todo: TodoCreate):\n    global next_id\n    new_todo = {\"id\": next_id, \"title\": todo.title, \"priority\": todo.priority, \"created_at\": str(datetime.now())}\n    todos[next_id] = new_todo\n    next_id += 1\n    return new_todo\n\n# 修改 GET /todos 支持 priority 过滤\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "POST",
+          "path": "/todos",
+          "expected_status": 201,
+          "expected_body_contains": "high",
+          "body": {"title": "A任务", "priority": "high"},
+          "description": "先创建一条 high"
+        },
+        {
+          "type": "http_test",
+          "method": "POST",
+          "path": "/todos",
+          "expected_status": 201,
+          "expected_body_contains": "low",
+          "body": {"title": "B任务", "priority": "low"},
+          "description": "再创建一条 low"
+        },
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/todos?priority=high",
+          "expected_status": 200,
+          "expected_body_contains": "A任务",
+          "description": "过滤后只有 high"
+        }
+      ],
+      "hints": [
+        "def get_todos(priority: str | None = None):",
+        "if priority: return [t for t in todos.values() if t[\"priority\"] == priority]",
+        "else: return list(todos.values())"
+      ]
+    }
+  ],
+  "challenge": {
+    "id": "challenge_15",
+    "order": 99,
+    "description": "### 挑战题：获取单个 Todo\n\n添加 `GET /todos/{todo_id}` 路由：\n- 如果 todo_id 存在，返回该 todo 对象\n- 如果不存在，抛出 404\n\n先创建一条，再通过 id 获取。\n\n**要求**：`GET /todos/1` 返回 todo 对象。",
+    "starter_code": "from fastapi import FastAPI, HTTPException\nfrom pydantic import BaseModel\nfrom datetime import datetime\n\napp = FastAPI()\ntodos = {}\nnext_id = 1\n\nclass TodoCreate(BaseModel):\n    title: str\n    priority: str = \"medium\"\n\n@app.post(\"/todos\", status_code=201)\nasync def create(todo: TodoCreate):\n    global next_id\n    new_todo = {\"id\": next_id, \"title\": todo.title, \"priority\": todo.priority, \"created_at\": str(datetime.now())}\n    todos[next_id] = new_todo\n    next_id += 1\n    return new_todo\n\n@app.get(\"/todos\")\nasync def get_todos(priority: str | None = None):\n    if priority:\n        return [t for t in todos.values() if t[\"priority\"] == priority]\n    return list(todos.values())\n\n# 添加 GET /todos/{todo_id}\n",
+    "test_cases": [
+      {
+        "type": "http_test",
+        "method": "POST",
+        "path": "/todos",
+        "expected_status": 201,
+        "expected_body_contains": "测试",
+        "body": {"title": "测试任务", "priority": "medium"},
+        "description": "创建一条用于查询"
+      },
+      {
+        "type": "http_test",
+        "method": "GET",
+        "path": "/todos/1",
+        "expected_status": 200,
+        "expected_body_contains": "测试任务",
+        "description": "按 id 查询成功"
+      },
+      {
+        "type": "http_test",
+        "method": "GET",
+        "path": "/todos/99",
+        "expected_status": 404,
+        "expected_body_contains": "",
+        "description": "不存在的 id 返回 404"
+      }
+    ],
+    "hints": [
+      "if todo_id not in todos: raise HTTPException(404, detail=\"不存在\")",
+      "return todos[todo_id]",
+      "参数类型: todo_id: int"
+    ]
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "id": "quest_14",
+  "title": "校验之印 — Pydantic 深度应用",
+  "phase": 2,
+  "order": 14,
+  "xp_reward": 180,
+  "coin_reward": 70,
+  "story": "> *派森大师摘下手上一枚刻满符文的戒指。*\n\n**派森大师**：「这枚**校验之印**由 Pydantic 铸造。所有进入你魔法阵的数据，都必须通过它的校验。`Field()` 设定约束，`Enum` 限定选项，嵌套模型构建复杂结构。不合规的数据在到达你的函数之前就会被 422 拦截。」",
+  "content": "## Pydantic 数据校验\n\n### Field() 约束\n```python\nfrom pydantic import BaseModel, Field\n\nclass Spell(BaseModel):\n    name: str = Field(..., min_length=1, max_length=50)\n    power: int = Field(..., ge=1, le=100, description=\"威力 1-100\")\n```\n- `...` 表示必填\n- `min_length/max_length` 字符串长度限制\n- `ge/le` 数值范围（>= 和 <=）\n\n### Enum 枚举\n```python\nfrom enum import Enum\n\nclass Element(str, Enum):\n    FIRE = \"fire\"\n    WATER = \"water\"\n    WIND = \"wind\"\n```\n\n### 嵌套模型\n```python\nclass Wizard(BaseModel):\n    name: str\n    spells: list[Spell]  # 嵌套 Spell 列表\n```",
+  "tasks": [
+    {
+      "id": "task_14_01",
+      "order": 1,
+      "description": "### 任务一：Field 约束\n\n用 Pydantic 创建 `Potion` 模型：\n- `name: str` — 必填，长度 1~30\n- `heal: int` — 必填，范围 1~100\n\n创建 `POST /potion`，接收 Potion 并返回 `{\"created\": name, \"heal\": heal}`。\n\n测试用 `{\"name\": \"治疗药水\", \"heal\": 50}` 验证。\n\n**要求**：正确返回创建信息。",
+      "starter_code": "from fastapi import FastAPI\nfrom pydantic import BaseModel, Field\n\napp = FastAPI()\n\nclass Potion(BaseModel):\n    name: str = Field(..., min_length=1, max_length=30)\n    heal: int = Field(..., ge=1, le=100)\n\n# 添加 POST /potion\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "POST",
+          "path": "/potion",
+          "expected_status": 200,
+          "expected_body_contains": "治疗药水",
+          "body": {"name": "治疗药水", "heal": 50},
+          "description": "正确接收有效数据"
+        }
+      ],
+      "hints": [
+        "@app.post(\"/potion\")",
+        "async def create(potion: Potion):",
+        "return {\"created\": potion.name, \"heal\": potion.heal}"
+      ]
+    },
+    {
+      "id": "task_14_02",
+      "order": 2,
+      "description": "### 任务二：枚举类型\n\n创建枚举 `Rarity(str, Enum)`：`COMMON = \"common\"`, `RARE = \"rare\"`, `LEGENDARY = \"legendary\"`。\n\n创建 `Item` 模型：`name: str` + `rarity: Rarity`。\n\n创建 `POST /item`，返回物品名和稀有度。\n\n测试用 `{\"name\": \"龙鳞盾\", \"rarity\": \"legendary\"}`。\n\n**要求**：返回 legendary。",
+      "starter_code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\nfrom enum import Enum\n\napp = FastAPI()\n\nclass Rarity(str, Enum):\n    COMMON = \"common\"\n    RARE = \"rare\"\n    LEGENDARY = \"legendary\"\n\nclass Item(BaseModel):\n    name: str\n    rarity: Rarity\n\n# 添加 POST /item\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "POST",
+          "path": "/item",
+          "expected_status": 200,
+          "expected_body_contains": "legendary",
+          "body": {"name": "龙鳞盾", "rarity": "legendary"},
+          "description": "枚举值正确接收"
+        }
+      ],
+      "hints": [
+        "class Rarity(str, Enum): 继承 str 和 Enum",
+        "async def create(item: Item):",
+        "return {\"name\": item.name, \"rarity\": item.rarity.value}"
+      ]
+    },
+    {
+      "id": "task_14_03",
+      "order": 3,
+      "description": "### 任务三：嵌套模型\n\n定义 `Spell`(name, power) 和 `Wizard`(name, spells: list[Spell])。\n\n创建 `POST /wizard`，接收 Wizard 并返回 `{\"wizard\": name, \"spell_count\": len(spells)}`。\n\n测试发送：\n```json\n{\"name\": \"大法师\", \"spells\": [{\"name\": \"火球\", \"power\": 80}, {\"name\": \"冰箭\", \"power\": 60}]}\n```\n\n**要求**：返回 spell_count=2。",
+      "starter_code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\n\napp = FastAPI()\n\nclass Spell(BaseModel):\n    name: str\n    power: int\n\nclass Wizard(BaseModel):\n    name: str\n    spells: list[Spell]\n\n# 添加 POST /wizard\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "POST",
+          "path": "/wizard",
+          "expected_status": 200,
+          "expected_body_contains": "\"spell_count\":2",
+          "body": {"name": "大法师", "spells": [{"name": "火球", "power": 80}, {"name": "冰箭", "power": 60}]},
+          "description": "嵌套模型正确解析"
+        }
+      ],
+      "hints": [
+        "@app.post(\"/wizard\")",
+        "async def create(wizard: Wizard):",
+        "return {\"wizard\": wizard.name, \"spell_count\": len(wizard.spells)}"
+      ]
+    }
+  ],
+  "challenge": {
+    "id": "challenge_14",
+    "order": 99,
+    "description": "### 挑战题：完整数据校验\n\n创建 `POST /register` 路由，接收 Wizard 注册信息：\n- `name: str` — 必填，2~20 字符\n- `level: int` — 必填，1~99\n- `school: str` — 只能是 \"fire\"、\"water\"、\"wind\" 之一\n\n返回 `{\"wizard\": name, \"level\": level, \"school\": school}`。\n\n测试用 `{\"name\": \"火焰法师\", \"level\": 42, \"school\": \"fire\"}`。\n\n**要求**：正确返回所有字段。",
+    "starter_code": "from fastapi import FastAPI\nfrom pydantic import BaseModel, Field\nfrom enum import Enum\n\napp = FastAPI()\n\n# 定义枚举和模型\n\n# 添加 POST /register\n",
+    "test_cases": [
+      {
+        "type": "http_test",
+        "method": "POST",
+        "path": "/register",
+        "expected_status": 200,
+        "expected_body_contains": "火焰法师",
+        "body": {"name": "火焰法师", "level": 42, "school": "fire"},
+        "description": "完整校验通过"
+      }
+    ],
+    "hints": [
+      "用 str, Enum 定义 School 枚举",
+      "Field(...) 表示必填，min_length/max_length 限制字符串",
+      "level: int = Field(..., ge=1, le=99)"
+    ]
+  }
+}

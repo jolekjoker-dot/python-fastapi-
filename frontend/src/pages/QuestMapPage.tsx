@@ -96,22 +96,69 @@ export function QuestMapPage() {
           </div>
         </div>
 
-        {/* Coming soon */}
-        <div className="max-w-3xl mx-auto mt-12 opacity-40">
-          <h2 className="text-xl text-center text-text-muted mb-4">
-            第二篇章：魔法阵构筑 — FastAPI（即将开放）
-          </h2>
-          <div className="flex justify-center gap-3">
-            {[11, 12, 13, 14, 15, 16, 17, 18].map((n) => (
-              <div
-                key={n}
-                className="w-20 h-20 rounded-lg bg-surface-panel/50 border border-text-muted/30 flex items-center justify-center text-text-muted text-sm"
-              >
-                {n === 18 ? '👑' : n}
+        {/* Phase 2 */}
+        {quests.filter((q) => q.phase === 2).length > 0 && (
+          <div className="mt-12">
+            <h2 className="text-xl text-center text-text-muted mb-4">
+              第二篇章：魔法阵构筑 — FastAPI
+            </h2>
+            <div className="max-w-3xl mx-auto">
+              <div className="flex flex-wrap justify-center gap-4">
+                {quests
+                  .filter((q) => q.phase === 2)
+                  .map((quest, i, arr) => {
+                    const isLast = quest.order === 18
+                    return (
+                      <div key={quest.id} className="flex items-center">
+                        <button
+                          onClick={() => {
+                            if (quest.unlocked || quest.completed) {
+                              navigate(`/quest/${quest.id}`)
+                            }
+                          }}
+                          disabled={!quest.unlocked && !quest.completed}
+                          className={`w-36 h-36 rounded-xl flex flex-col items-center justify-center gap-1 border-2 transition-all cursor-pointer ${
+                            quest.completed
+                              ? 'border-success bg-success/10 hover:bg-success/20'
+                              : quest.unlocked
+                                ? 'border-gold bg-gold/10 hover:bg-gold/20 animate-pulse'
+                                : 'border-text-muted/30 bg-surface-panel/50 opacity-50 cursor-not-allowed'
+                          }`}
+                        >
+                          {isLast ? (
+                            <span className="text-3xl">👑</span>
+                          ) : (
+                            <span className="text-2xl font-bold text-gold">
+                              {quest.order}
+                            </span>
+                          )}
+                          <span className="text-xs text-center px-1 text-text-primary leading-tight">
+                            {quest.title.split('—')[0].trim()}
+                          </span>
+                          <span className="text-xs text-text-muted">
+                            {quest.xp_reward} XP
+                          </span>
+                          {quest.completed && (
+                            <span className="text-success text-lg">✓</span>
+                          )}
+                          {quest.unlocked && !quest.completed && (
+                            <span className="text-gold text-xs">Ready</span>
+                          )}
+                        </button>
+                        {i < arr.length - 1 && (
+                          <div
+                            className={`w-8 h-0.5 -ml-1 -mr-1 ${
+                              quest.completed ? 'bg-success' : 'bg-text-muted/30'
+                            }`}
+                          />
+                        )}
+                      </div>
+                    )
+                  })}
               </div>
-            ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )

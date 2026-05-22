@@ -1,0 +1,96 @@
+{
+  "id": "quest_11",
+  "title": "阵之起 — Hello FastAPI",
+  "phase": 2,
+  "order": 11,
+  "xp_reward": 150,
+  "coin_reward": 60,
+  "story": "> *派森大师带你登上学院最高的塔楼。塔顶地板上刻着一圈复杂的魔法阵纹路。*\n\n**派森大师**：「你已经掌握了 Python 咒语的基础。现在，你将学习如何构建**Web 魔法阵**——用 FastAPI 让咒语通过互联网与世界对话。`@app.get('/')` 就是你在魔法阵上刻下的第一条纹路。」\n\n**派森大师**：「吟唱第一句：`uvicorn main:app --reload`，你的魔法阵就会苏醒。」",
+  "content": "## FastAPI 入门\n\n### 创建第一个应用\n```python\nfrom fastapi import FastAPI\n\napp = FastAPI(title=\"我的第一个 API\")\n\n@app.get(\"/\")\nasync def root():\n    return {\"message\": \"Hello, World!\"}\n```\n\n### 启动服务器\n```bash\nuvicorn main:app --reload --port 8000\n```\n- `main` — 文件名 main.py\n- `app` — FastAPI 实例变量名\n- `--reload` — 代码修改后自动重启\n\n### 访问\n- 应用: http://localhost:8000\n- Swagger 文档: http://localhost:8000/docs\n\n### 路径参数\n```python\n@app.get(\"/hello/{name}\")\nasync def hello(name: str):\n    return {\"message\": f\"Hello, {name}!\"}\n```\n\n### 查询参数\n```python\n@app.get(\"/greet\")\nasync def greet(name: str = \"World\", times: int = 1):\n    return {\"messages\": [f\"Hello, {name}!\" for _ in range(times)]}\n```",
+  "tasks": [
+    {
+      "id": "task_11_01",
+      "order": 1,
+      "description": "### 任务一：创建第一个 FastAPI 应用\n\n创建一个 FastAPI 应用，包含一个根路由 `/`，返回 `{\"message\": \"Hello, FastAPI!\"}`。\n\n**注意**：FastAPI 实例必须命名为 `app`。",
+      "starter_code": "from fastapi import FastAPI\n\napp = FastAPI()\n\n# 在这里添加根路由\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/",
+          "expected_status": 200,
+          "expected_body_contains": "Hello, FastAPI!",
+          "description": "根路由返回 Hello, FastAPI!"
+        }
+      ],
+      "hints": [
+        "@app.get(\"/\") 装饰器定义 GET 路由",
+        "async def root(): return {\"message\": \"Hello, FastAPI!\"}",
+        "访问 /docs 可以看到自动生成的 API 文档"
+      ]
+    },
+    {
+      "id": "task_11_02",
+      "order": 2,
+      "description": "### 任务二：路径参数\n\n添加路由 `/hello/{name}`，接收路径中的名字并返回问候语。\n\n例如访问 `/hello/法师` 应返回包含\"法师\"的 JSON。\n\n**要求**：返回 `{\"message\": \"你好，法师！\"}`",
+      "starter_code": "from fastapi import FastAPI\n\napp = FastAPI()\n\n@app.get(\"/\")\nasync def root():\n    return {\"message\": \"Hello\"}\n\n# 添加 /hello/{name} 路由\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/hello/法师",
+          "expected_status": 200,
+          "expected_body_contains": "你好，法师！",
+          "description": "路径参数正确返回"
+        }
+      ],
+      "hints": [
+        "@app.get(\"/hello/{name}\")",
+        "函数参数 name: str 会自动接收路径中的值",
+        "return {\"message\": f\"你好，{name}！\"}"
+      ]
+    },
+    {
+      "id": "task_11_03",
+      "order": 3,
+      "description": "### 任务三：查询参数\n\n添加路由 `/greet`，接受查询参数 `name`（默认值 \"World\"）和 `times`（默认值 1）。\n\n访问 `/greet?name=学徒&times=3` 应返回 3 条问候语的列表。\n\n**要求**：返回的 JSON 中 `messages` 数组包含 3 个字符串。",
+      "starter_code": "from fastapi import FastAPI\n\napp = FastAPI()\n\n# 添加 /greet 路由\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/greet?name=学徒&times=3",
+          "expected_status": 200,
+          "expected_body_contains": "Hello, 学徒!",
+          "description": "查询参数：返回 3 条问候语"
+        }
+      ],
+      "hints": [
+        "def greet(name: str = \"World\", times: int = 1):",
+        "用列表推导式生成问候语: [f\"Hello, {name}!\" for _ in range(times)]",
+        "return {\"messages\": messages}"
+      ]
+    }
+  ],
+  "challenge": {
+    "id": "challenge_11",
+    "order": 99,
+    "description": "### 挑战题：多方法路由\n\n创建 `/items` 路由，同时支持 GET 和 POST：\n- GET `/items` → 返回 `{\"items\": [\"item1\", \"item2\"]}`\n- POST `/items` → 返回 `{\"message\": \"Item created\"}`（状态码 201 不作为检查要求）\n\n**要求**：GET 请求返回 item 列表。",
+    "starter_code": "from fastapi import FastAPI\n\napp = FastAPI()\n\n# 添加 GET /items\n\n# 添加 POST /items\n",
+    "test_cases": [
+      {
+        "type": "http_test",
+        "method": "GET",
+        "path": "/items",
+        "expected_status": 200,
+        "expected_body_contains": "item1",
+        "description": "GET /items 返回列表"
+      }
+    ],
+    "hints": [
+      "@app.get(\"/items\") 处理 GET",
+      "@app.post(\"/items\") 处理 POST",
+      "GET 返回 {\"items\": [...]}"
+    ]
+  }
+}

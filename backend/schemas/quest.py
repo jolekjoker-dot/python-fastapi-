@@ -3,9 +3,15 @@ from pydantic import BaseModel
 
 class TestCase(BaseModel):
     type: str = "output_match"
-    expected: str
+    expected: str = ""
     input_data: str | None = None
     description: str = ""
+    # HTTP test fields (type="http_test")
+    method: str = "GET"
+    path: str = "/"
+    expected_status: int = 200
+    expected_body_contains: str = ""
+    body: dict | list | None = None
 
 
 class QuestTask(BaseModel):

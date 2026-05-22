@@ -1,0 +1,105 @@
+{
+  "id": "quest_17",
+  "title": "神器觉醒 — 项目重构与优化",
+  "phase": 2,
+  "order": 17,
+  "xp_reward": 200,
+  "coin_reward": 80,
+  "story": "> *派森大师审视着你搭建的 Todo 魔法阵。虽然运转正常，但所有纹路都挤在一张卷轴上。*\n\n**派森大师**：「一个真正的魔法阵需要模块化。`APIRouter` 把纹路分组，`Depends` 注入共享魔力，`CORSMiddleware` 守护阵门。重构之后，你的魔法阵将更清晰、更安全、更容易扩展。」",
+  "content": "## 项目重构\n\n### APIRouter — 拆分路由\n```python\n# routers/todos.py\nfrom fastapi import APIRouter\n\nrouter = APIRouter(prefix=\"/todos\", tags=[\"todos\"])\n\n@router.get(\"\")\nasync def get_todos():\n    ...\n\n# main.py\nfrom routers.todos import router as todos_router\napp.include_router(todos_router)\n```\n\n### Depends — 依赖注入\n```python\nasync def get_db():\n    return {\"todos\": todos, \"next_id\": next_id}\n\n@router.get(\"\")\nasync def get_todos(db=Depends(get_db)):\n    ...\n```\n\n### CORS 中间件\n```python\nfrom fastapi.middleware.cors import CORSMiddleware\n\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=[\"*\"],\n    allow_methods=[\"*\"],\n    allow_headers=[\"*\"],\n)\n```",
+  "tasks": [
+    {
+      "id": "task_17_01",
+      "order": 1,
+      "description": "### 任务一：APIRouter 拆分\n\n将 Todo 路由从主文件拆分到 APIRouter。创建 `todos_router = APIRouter(prefix=\"/todos\")`，将 GET 和 POST 路由移到 router 上，然后在 app 中 `include_router`。\n\n**要求**：GET /todos 仍然正常工作。",
+      "starter_code": "from fastapi import FastAPI, APIRouter\nfrom pydantic import BaseModel\nfrom datetime import datetime\n\n# 创建 APIRouter，拆分 /todos 路由\n\n\napp = FastAPI()\n\n# 用 app.include_router 注册\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/todos",
+          "expected_status": 200,
+          "expected_body_contains": "",
+          "description": "APIRouter 拆分后仍正常工作"
+        }
+      ],
+      "hints": [
+        "router = APIRouter(prefix=\"/todos\", tags=[\"todos\"])",
+        "用 @router.get(\"\") 代替 @app.get(\"/todos\")",
+        "app.include_router(router)"
+      ]
+    },
+    {
+      "id": "task_17_02",
+      "order": 2,
+      "description": "### 任务二：依赖注入\n\n创建 `get_store()` 函数返回存储字典，用 `Depends(get_store)` 注入到路由中。\n\n创建 `GET /store` 路由，通过 Depends 获取 store 并返回。\n\n**要求**：GET /store 返回 `{\"version\": \"1.0\"}`。",
+      "starter_code": "from fastapi import FastAPI, Depends\n\nasync def get_store():\n    return {\"version\": \"1.0\", \"data\": []}\n\napp = FastAPI()\n\n# 添加 GET /store，用 Depends 注入\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/store",
+          "expected_status": 200,
+          "expected_body_contains": "\"version\":\"1.0\"",
+          "description": "Depends 注入正常"
+        }
+      ],
+      "hints": [
+        "@app.get(\"/store\")",
+        "async def get_store_info(store=Depends(get_store)):",
+        "return store"
+      ]
+    },
+    {
+      "id": "task_17_03",
+      "order": 3,
+      "description": "### 任务三：CORS 中间件\n\n创建 FastAPI 应用，添加 CORS 中间件，允许所有来源。\n\n创建 `GET /data` 返回 `{\"msg\": \"ok\"}`。\n\n**要求**：GET /data 返回 200。",
+      "starter_code": "from fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\n\napp = FastAPI()\n\n# 添加 CORS 中间件\n\n# 添加 GET /data\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/data",
+          "expected_status": 200,
+          "expected_body_contains": "ok",
+          "description": "CORS 配置后路由正常"
+        }
+      ],
+      "hints": [
+        "app.add_middleware(CORSMiddleware, allow_origins=[\"*\"], allow_methods=[\"*\"], allow_headers=[\"*\"])",
+        "@app.get(\"/data\")",
+        "return {\"msg\": \"ok\"}"
+      ]
+    }
+  ],
+  "challenge": {
+    "id": "challenge_17",
+    "order": 99,
+    "description": "### 挑战题：模块化重构\n\n将 Todo API 重构为模块化结构：\n1. 用 APIRouter 拆分 /todos 路由\n2. 用 Depends 注入存储\n3. 添加 CORS 中间件\n\n实现 GET /todos 和 POST /todos 两个路由。\n\n**要求**：GET /todos 和 POST /todos 都正常工作。",
+    "starter_code": "from fastapi import FastAPI, APIRouter, Depends\nfrom fastapi.middleware.cors import CORSMiddleware\nfrom pydantic import BaseModel\nfrom datetime import datetime\n\n# 存储\nstore = {\"todos\": {}, \"next_id\": 1}\n\ndef get_store():\n    return store\n\n# APIRouter\nrouter = APIRouter(prefix=\"/todos\")\n\nclass TodoCreate(BaseModel):\n    title: str\n\n# 在 router 上添加 GET 和 POST\n\n\napp = FastAPI()\n# CORS + include_router\n",
+    "test_cases": [
+      {
+        "type": "http_test",
+        "method": "GET",
+        "path": "/todos",
+        "expected_status": 200,
+        "expected_body_contains": "",
+        "description": "GET 正常"
+      },
+      {
+        "type": "http_test",
+        "method": "POST",
+        "path": "/todos",
+        "expected_status": 201,
+        "expected_body_contains": "重构测试",
+        "body": {"title": "重构测试"},
+        "description": "POST 正常"
+      }
+    ],
+    "hints": [
+      "在 router 上用 @router.get(\"\") 和 @router.post(\"\")",
+      "每个路由函数加 store=Depends(get_store)",
+      "app.add_middleware + app.include_router"
+    ]
+  }
+}

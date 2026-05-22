@@ -14,7 +14,9 @@ class Settings(BaseSettings):
     SANDBOX_TIMEOUT: int = 5
     SANDBOX_MAX_MEMORY_MB: int = 128
 
-    PYTHON_PATH: str = "python"
+    PYTHON_PATH: str = str(
+        _backend_dir.parent / "venv" / "Scripts" / "python.exe"
+    )
 
     class Config:
         env_file = ".env"

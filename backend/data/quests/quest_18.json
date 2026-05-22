@@ -1,0 +1,128 @@
+{
+  "id": "quest_18",
+  "title": "Boss 战 — 魔法阵构筑·终章",
+  "phase": 2,
+  "order": 18,
+  "xp_reward": 800,
+  "coin_reward": 300,
+  "story": "> *「全栈贤者」降临在塔顶。他的法袍上绣着无数魔法阵的纹路，每一道都代表一个完整的 API 系统。*\n\n**全栈贤者**：「学徒，你已经学会了 FastAPI 的所有基础魔法。现在，从零构建一个**魔法物品交易市场 API**——完整的 CRUD、Pydantic 校验、错误处理、模块化路由。这是你成为中级法师的最后一道试炼。」\n\n**Bug 恶魔**：「这次可是真刀真枪……祝你好运。」",
+  "content": "## Boss 战：魔法物品交易市场 API\n\n### 功能要求\n1. 物品 CRUD（name, price, category）\n2. Pydantic 完整校验（Field 约束 + 枚举）\n3. 404 错误处理\n4. 搜索过滤（按 category 过滤）\n5. 批量创建\n\n### 你需要创建以下端点\n- `GET /items` — 获取所有物品（支持 ?category=xxx 过滤）\n- `GET /items/{id}` — 获取单个物品（不存在返回 404）\n- `POST /items` — 创建物品\n- `POST /items/batch` — 批量创建\n- `DELETE /items/{id}` — 删除物品（不存在返回 404）",
+  "tasks": [
+    {
+      "id": "task_18_01",
+      "order": 1,
+      "description": "### Boss 战任务一：数据模型 + 基础 CRUD\n\n定义 Pydantic 模型和实现 GET/POST：\n1. `ItemCreate(BaseModel)`：name(str, 1~50), price(float, 0.01~9999), category(str, 默认 \"misc\")\n2. `GET /items` — 返回物品列表\n3. `POST /items` (status_code=201) — 创建新物品\n\n**要求**：POST 创建 `{\"name\": \"魔法剑\", \"price\": 150.0}` 并验证 GET 能看到。",
+      "starter_code": "from fastapi import FastAPI\nfrom pydantic import BaseModel, Field\nfrom datetime import datetime\n\napp = FastAPI()\nitems = {}\nnext_id = 1\n\n# 定义 ItemCreate 模型\n\n# GET /items\n\n# POST /items\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "POST",
+          "path": "/items",
+          "expected_status": 201,
+          "expected_body_contains": "魔法剑",
+          "body": {"name": "魔法剑", "price": 150.0, "category": "weapon"},
+          "description": "创建魔法剑"
+        },
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/items",
+          "expected_status": 200,
+          "expected_body_contains": "魔法剑",
+          "description": "GET 能看到魔法剑"
+        }
+      ],
+      "hints": [
+        "class ItemCreate(BaseModel):",
+        "name: str = Field(..., min_length=1, max_length=50)",
+        "price: float = Field(..., ge=0.01, le=9999)"
+      ]
+    },
+    {
+      "id": "task_18_02",
+      "order": 2,
+      "description": "### Boss 战任务二：过滤 + 单个查询\n\n在任务一基础上添加：\n1. `GET /items?category=xxx` — 按类别过滤\n2. `GET /items/{item_id}` — 获取单个物品（不存在返回 404）\n\n**要求**：过滤和单个查询正常工作。",
+      "starter_code": "from fastapi import FastAPI, HTTPException, Query\nfrom pydantic import BaseModel, Field\nfrom datetime import datetime\n\napp = FastAPI()\nitems = {}\nnext_id = 1\n\nclass ItemCreate(BaseModel):\n    name: str = Field(..., min_length=1, max_length=50)\n    price: float = Field(..., ge=0.01, le=9999)\n    category: str = \"misc\"\n\n@app.post(\"/items\", status_code=201)\nasync def create(item: ItemCreate):\n    global next_id\n    new_item = {\"id\": next_id, \"name\": item.name, \"price\": item.price, \"category\": item.category, \"created_at\": str(datetime.now())}\n    items[next_id] = new_item\n    next_id += 1\n    return new_item\n\n# 修改 GET /items 支持 category 过滤\n\n# 添加 GET /items/{item_id}\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "POST",
+          "path": "/items",
+          "expected_status": 201,
+          "expected_body_contains": "",
+          "body": {"name": "冰霜法杖", "price": 300.0, "category": "weapon"},
+          "description": "创建武器类物品"
+        },
+        {
+          "type": "http_test",
+          "method": "POST",
+          "path": "/items",
+          "expected_status": 201,
+          "expected_body_contains": "",
+          "body": {"name": "回复药水", "price": 50.0, "category": "potion"},
+          "description": "创建药水类物品"
+        },
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/items?category=weapon",
+          "expected_status": 200,
+          "expected_body_contains": "冰霜法杖",
+          "description": "按 category 过滤"
+        },
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/items/1",
+          "expected_status": 200,
+          "expected_body_contains": "冰霜法杖",
+          "description": "单个查询成功"
+        },
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/items/99",
+          "expected_status": 404,
+          "expected_body_contains": "",
+          "description": "不存在的 id 返回 404"
+        }
+      ],
+      "hints": [
+        "GET /items: def get_items(category: str | None = None):",
+        "if category: return [i for i in items.values() if i[\"category\"] == category]",
+        "GET /items/{id}: if id not in items: raise HTTPException(404)"
+      ]
+    },
+    {
+      "id": "task_18_03",
+      "order": 3,
+      "description": "### Boss 战任务三：批量创建 + 删除\n\n添加：\n1. `POST /items/batch` — 接收 `list[ItemCreate]`，批量创建\n2. `DELETE /items/{item_id}` — 删除物品（status_code=204）\n\n**要求**：批量创建返回数组，DELETE 返回 204。",
+      "starter_code": "from fastapi import FastAPI, HTTPException\nfrom pydantic import BaseModel, Field\nfrom datetime import datetime\n\napp = FastAPI()\nitems = {}\nnext_id = 1\n\nclass ItemCreate(BaseModel):\n    name: str = Field(..., min_length=1, max_length=50)\n    price: float = Field(..., ge=0.01, le=9999)\n    category: str = \"misc\"\n\n@app.get(\"/items\")\nasync def get_items(category: str | None = None):\n    if category:\n        return [i for i in items.values() if i[\"category\"] == category]\n    return list(items.values())\n\n@app.get(\"/items/{item_id}\")\nasync def get_item(item_id: int):\n    if item_id not in items:\n        raise HTTPException(404, detail=\"物品不存在\")\n    return items[item_id]\n\n@app.post(\"/items\", status_code=201)\nasync def create(item: ItemCreate):\n    global next_id\n    new_item = {\"id\": next_id, \"name\": item.name, \"price\": item.price, \"category\": item.category, \"created_at\": str(datetime.now())}\n    items[next_id] = new_item\n    next_id += 1\n    return new_item\n\n# 添加 POST /items/batch\n\n# 添加 DELETE /items/{item_id}\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "POST",
+          "path": "/items/batch",
+          "expected_status": 201,
+          "expected_body_contains": "\"id\":2",
+          "body": [{"name": "铁剑", "price": 100.0, "category": "weapon"}, {"name": "木盾", "price": 80.0, "category": "armor"}],
+          "description": "批量创建 2 件"
+        },
+        {
+          "type": "http_test",
+          "method": "DELETE",
+          "path": "/items/1",
+          "expected_status": 204,
+          "expected_body_contains": "",
+          "description": "删除返回 204"
+        }
+      ],
+      "hints": [
+        "POST /batch: async def create_batch(items_input: list[ItemCreate]):",
+        "遍历创建，status_code=201",
+        "DELETE: @app.delete(\"/items/{item_id}\", status_code=204)"
+      ]
+    }
+  ],
+  "challenge": null
+}
