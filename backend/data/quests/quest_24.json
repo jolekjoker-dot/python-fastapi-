@@ -1,0 +1,141 @@
+{
+  "id": "quest_24",
+  "title": "游戏之魂 — 游戏化系统 API",
+  "phase": 3,
+  "order": 24,
+  "xp_reward": 300,
+  "coin_reward": 120,
+  "story": "> *「全栈贤者」从虚空中抽出一张流光溢彩的羊皮纸，上面绘制着 XP 进度条、成就徽章和打卡日历的魔法阵图。*\n\n**全栈贤者**：「好的学习平台需要**游戏化灵魂**。XP 系统激励进步，成就徽章标记里程碑，连续打卡培养习惯。今天，你要用 FastAPI 从零构建这套系统的后端 API。」",
+  "content": "## 游戏化系统设计\n\n### XP 系统\n```python\n# 等级公式：每 1000 XP 升一级\ndef xp_to_level(xp: int) -> int:\n    return xp // 1000 + 1\n\n# 升级所需 XP\ndef xp_for_next_level(level: int) -> int:\n    return level * 1000\n```\n\n### 成就系统\n```python\nachievements = {\n    \"first_quest\": {\"name\": \"初出茅庐\", \"description\": \"完成第一个任务\", \"xp_reward\": 50},\n    \"ten_quests\": {\"name\": \"学霸之证\", \"description\": \"完成 10 个任务\", \"xp_reward\": 200},\n}\n```\n\n### 打卡系统\n- 记录每日首次登录\n- 连续天数计算：从今天往回数连续有记录的天数\n- 奖励：7 天 +100 XP，30 天 +500 XP",
+  "tasks": [
+    {
+      "id": "task_24_01",
+      "order": 1,
+      "description": "### 任务一：XP 和等级系统\n\n创建 FastAPI 应用，实现：\n- `POST /xp/gain` — 接收 `{\"user_id\": 1, \"amount\": 100}`，增加 XP\n- `GET /xp/{user_id}` — 返回 `{\"xp\": total_xp, \"level\": level}`\n\n等级计算：每 1000 XP = 1 级（level = xp // 1000 + 1）。\n\n**要求**：POST 增加 XP，GET 返回正确的等级。",
+      "starter_code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\n\napp = FastAPI()\n\n# user_id -> xp 的字典\nxp_store = {}\n\nclass XpGain(BaseModel):\n    user_id: int\n    amount: int\n\n# POST /xp/gain\n\n# GET /xp/{user_id}\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "POST",
+          "path": "/xp/gain",
+          "expected_status": 200,
+          "expected_body_contains": "\"xp\":500",
+          "body": {"user_id": 1, "amount": 500},
+          "description": "增加 500 XP"
+        },
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/xp/1",
+          "expected_status": 200,
+          "expected_body_contains": "\"level\":1",
+          "description": "500 XP 对应 level 1"
+        }
+      ],
+      "hints": [
+        "if user_id not in xp_store: xp_store[user_id] = 0",
+        "xp_store[user_id] += data.amount",
+        "level = xp_store[user_id] // 1000 + 1"
+      ]
+    },
+    {
+      "id": "task_24_02",
+      "order": 2,
+      "description": "### 任务二：成就系统\n\n添加预定义成就列表和检测逻辑：\n- 成就：`total_xp_1000`（累计获得 1000 XP → 获得）\n- 成就：`level_5`（达到 5 级 → 获得）\n\n添加 `GET /achievements/{user_id}` 返回该用户已解锁的成就列表。\n\n先给用户加 1500 XP，再查成就。\n\n**要求**：GET /achievements/1 包含 `total_xp_1000` 成就。",
+      "starter_code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\n\napp = FastAPI()\n\nxp_store = {}\n\n# 预定义成就\nALL_ACHIEVEMENTS = {\n    \"total_xp_1000\": {\"name\": \"千分达人\", \"condition\": lambda xp: xp >= 1000},\n    \"level_5\": {\"name\": \"五级法师\", \"condition\": lambda xp: xp // 1000 + 1 >= 5},\n}\n\nuser_achievements = {}\n\nclass XpGain(BaseModel):\n    user_id: int\n    amount: int\n\n@app.post(\"/xp/gain\")\nasync def gain_xp(data: XpGain):\n    uid = data.user_id\n    if uid not in xp_store: xp_store[uid] = 0\n    xp_store[uid] += data.amount\n    # 检查成就\n    if uid not in user_achievements: user_achievements[uid] = []\n    for aid, ach in ALL_ACHIEVEMENTS.items():\n        if aid not in user_achievements[uid] and ach[\"condition\"](xp_store[uid]):\n            user_achievements[uid].append(aid)\n    return {\"xp\": xp_store[uid]}\n\n# GET /achievements/{user_id}\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "POST",
+          "path": "/xp/gain",
+          "expected_status": 200,
+          "expected_body_contains": "",
+          "body": {"user_id": 1, "amount": 1500},
+          "description": "先加 1500 XP"
+        },
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/achievements/1",
+          "expected_status": 200,
+          "expected_body_contains": "total_xp_1000",
+          "description": "解锁了千分达人"
+        }
+      ],
+      "hints": [
+        "GET /achievements/{user_id}: return user_achievements.get(user_id, [])",
+        "返回格式: [{\"id\": aid, \"name\": ALL_ACHIEVEMENTS[aid][\"name\"]}]",
+        "成就自动检测在 gain_xp 中完成"
+      ]
+    },
+    {
+      "id": "task_24_03",
+      "order": 3,
+      "description": "### 任务三：打卡系统\n\n实现打卡逻辑：\n- `POST /checkin` — 接收 `{\"user_id\": 1}`，记录当天日期\n- `GET /streak/{user_id}` — 返回 `{\"streak\": 连续天数}`\n\n连续天数从今天往回数，直到中断为止。\n\n**要求**：POST /checkin 后，GET /streak 返回 streak >= 1。",
+      "starter_code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\nfrom datetime import date\n\napp = FastAPI()\n\n# user_id -> set of date strings\ncheckins = {}\n\nclass CheckinRequest(BaseModel):\n    user_id: int\n\n# POST /checkin\n\n# GET /streak/{user_id}\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "POST",
+          "path": "/checkin",
+          "expected_status": 200,
+          "expected_body_contains": "ok",
+          "body": {"user_id": 1},
+          "description": "打卡成功"
+        },
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/streak/1",
+          "expected_status": 200,
+          "expected_body_contains": "\"streak\":1",
+          "description": "连续打卡 1 天"
+        }
+      ],
+      "hints": [
+        "打卡: today = str(date.today()); checkins[uid].add(today)",
+        "连续计算: 从今天往回数，while str(today - timedelta(days=i)) in checkins[uid]",
+        "返回 {\"streak\": count}"
+      ]
+    }
+  ],
+  "challenge": {
+    "id": "challenge_24",
+    "order": 99,
+    "description": "### 挑战题：完整游戏化 API\n\n整合 XP、成就、打卡三个系统到一个 FastAPI 应用中：\n1. XP 增加 + 等级计算\n2. 成就自动检测（增加 3 个成就规则）\n3. 打卡 + 连续天数\n4. 添加 `GET /profile/{user_id}` — 返回完整的用户游戏化数据\n\n**要求**：GET /profile/1 同时包含 xp、achievements、streak。",
+    "starter_code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\nfrom datetime import date, timedelta\n\napp = FastAPI()\n\n# 三个数据 store\nxp_store = {}\ncheckins = {}\nuser_achievements = {}\n\nALL_ACHIEVEMENTS = {\n    \"first_xp\": {\"name\": \"初次获得\", \"condition\": lambda xp: xp > 0},\n    \"xp_500\": {\"name\": \"修行者\", \"condition\": lambda xp: xp >= 500},\n    \"xp_2000\": {\"name\": \"大师\", \"condition\": lambda xp: xp >= 2000},\n}\n\n# POST /xp/gain\n\n# POST /checkin\n\n# GET /profile/{user_id}\n",
+    "test_cases": [
+      {
+        "type": "http_test",
+        "method": "POST",
+        "path": "/xp/gain",
+        "expected_status": 200,
+        "expected_body_contains": "",
+        "body": {"user_id": 1, "amount": 600},
+        "description": "加 600 XP"
+      },
+      {
+        "type": "http_test",
+        "method": "POST",
+        "path": "/checkin",
+        "expected_status": 200,
+        "expected_body_contains": "",
+        "body": {"user_id": 1},
+        "description": "打卡"
+      },
+      {
+        "type": "http_test",
+        "method": "GET",
+        "path": "/profile/1",
+        "expected_status": 200,
+        "expected_body_contains": "\"xp\":600",
+        "description": "Profile 包含 XP"
+      }
+    ],
+    "hints": [
+      "GET /profile: 整合三个 store 的数据",
+      "return {\"xp\": xp, \"level\": level, \"achievements\": achievements, \"streak\": streak}",
+      "每个子系统独立计算，profile 统一返回"
+    ]
+  }
+}

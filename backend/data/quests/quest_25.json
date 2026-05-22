@@ -1,0 +1,94 @@
+{
+  "id": "quest_25",
+  "title": "Boss 战 — 神器锻造·终章",
+  "phase": 3,
+  "order": 25,
+  "xp_reward": 2000,
+  "coin_reward": 800,
+  "story": "> *三大篇章的最终考验！「全栈贤者」手中的法杖爆发出耀眼的光芒，一个完整的魔法阵图在半空中展开。*\n\n**全栈贤者**：「学徒，这是最后的试炼。你将把代码封装进容器，让它在任何地方都能苏醒——这就是 **Docker 部署**。Dockerfile 是一张魔法蓝图，docker-compose.yml 编排多个容器协同工作。完成后，你将成为真正的**全栈大法师**。」\n\n**Bug 恶魔**：（恭敬地低头）「我已经没什么可教你的了。祝你好运。」",
+  "content": "## Docker 部署\n\n### Dockerfile\n```dockerfile\nFROM python:3.11-slim\nWORKDIR /app\nCOPY requirements.txt .\nRUN pip install -r requirements.txt\nCOPY . .\nCMD [\"uvicorn\", \"main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8000\"]\n```\n\n### docker-compose.yml\n```yaml\nversion: \"3.8\"\nservices:\n  api:\n    build: .\n    ports:\n      - \"8000:8000\"\n    volumes:\n      - ./data:/app/data\n```\n\n### 关键指令\n- `FROM` — 基础镜像\n- `WORKDIR` — 工作目录\n- `COPY` — 复制文件\n- `RUN` — 构建时执行命令\n- `CMD` — 容器启动命令\n- `EXPOSE` — 声明端口",
+  "tasks": [
+    {
+      "id": "task_25_01",
+      "order": 1,
+      "description": "### 任务一：编写 Dockerfile\n\n为一个 FastAPI 项目编写 `Dockerfile`：\n- 基于 `python:3.11-slim`\n- 工作目录 `/app`\n- 复制 `requirements.txt` 并安装依赖\n- 复制所有代码\n- 暴露 8000 端口\n- 启动命令：`uvicorn main:app --host 0.0.0.0 --port 8000`\n\n**要求**：代码输出包含 `\"FROM python:3.11-slim\"` 和 `\"uvicorn\"`。",
+      "starter_code": "# 用 print() 输出你的 Dockerfile 内容\nprint(\"\"\"\n\n\"\"\")\n",
+      "test_cases": [
+        {
+          "type": "output_contains",
+          "expected": "FROM python:3.11-slim",
+          "input_data": "",
+          "description": "使用正确的 base image"
+        },
+        {
+          "type": "output_contains",
+          "expected": "uvicorn",
+          "input_data": "",
+          "description": "包含 uvicorn 启动命令"
+        }
+      ],
+      "hints": [
+        "用三重引号 print 多行内容",
+        "FROM python:3.11-slim",
+        "CMD [\"uvicorn\", \"main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8000\"]"
+      ]
+    },
+    {
+      "id": "task_25_02",
+      "order": 2,
+      "description": "### 任务二：编写 docker-compose.yml\n\n编写 `docker-compose.yml` 编排两个服务：\n- `api` — FastAPI 后端（端口 8000）\n- `db` — PostgreSQL 数据库（端口 5432，镜像 `postgres:15`）\n\napi 服务依赖 db 服务。\n\n**要求**：输出包含 `\"postgres:15\"` 和 `\"ports:\"`。",
+      "starter_code": "# 用 print() 输出 docker-compose.yml 内容\nprint(\"\"\"\n\n\"\"\")\n",
+      "test_cases": [
+        {
+          "type": "output_contains",
+          "expected": "postgres:15",
+          "input_data": "",
+          "description": "包含 PostgreSQL 服务"
+        },
+        {
+          "type": "output_contains",
+          "expected": "ports:",
+          "input_data": "",
+          "description": "声明端口映射"
+        }
+      ],
+      "hints": [
+        "services: 下面定义 api 和 db 两个服务",
+        "db 用 image: postgres:15",
+        "ports: - \"8000:8000\" 映射端口"
+      ]
+    },
+    {
+      "id": "task_25_03",
+      "order": 3,
+      "description": "### 任务三：完整部署方案\n\n整合 Dockerfile 和 docker-compose.yml，输出完整的部署方案。\n\n同时添加：\n- `EXPOSE 8000` 在 Dockerfile 中\n- `depends_on` 在 docker-compose.yml 中（api 依赖 db）\n- 环境变量 `DATABASE_URL` 传递给 api 服务\n\n**要求**：输出包含 `\"EXPOSE\"` 和 `\"depends_on\"` 和 `\"DATABASE_URL\"`。",
+      "starter_code": "# 输出完整部署方案\nprint(\"=== Dockerfile ===\")\nprint(\"\"\"\n\n\"\"\")\nprint(\"=== docker-compose.yml ===\")\nprint(\"\"\"\n\n\"\"\")\n",
+      "test_cases": [
+        {
+          "type": "output_contains",
+          "expected": "EXPOSE",
+          "input_data": "",
+          "description": "Dockerfile 声明端口"
+        },
+        {
+          "type": "output_contains",
+          "expected": "depends_on",
+          "input_data": "",
+          "description": "compose 声明依赖关系"
+        },
+        {
+          "type": "output_contains",
+          "expected": "DATABASE_URL",
+          "input_data": "",
+          "description": "传递环境变量"
+        }
+      ],
+      "hints": [
+        "Dockerfile 中: EXPOSE 8000",
+        "docker-compose 中: depends_on: - db",
+        "environment: - DATABASE_URL=postgresql://..."
+      ]
+    }
+  ],
+  "challenge": null
+}

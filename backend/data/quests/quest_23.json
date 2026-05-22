@@ -1,0 +1,104 @@
+{
+  "id": "quest_23",
+  "title": "镜之彩绘 — 代码高亮组件",
+  "phase": 3,
+  "order": 23,
+  "xp_reward": 200,
+  "coin_reward": 80,
+  "story": "> *「全栈贤者」展开一卷发光的羊皮纸，上面的代码自动染上了不同的色彩——关键字是蓝色，字符串是橙色，注释是绿色。*\n\n**全栈贤者**：「代码高亮是每个技术平台的必备魔法。Prism.js 是最轻量的语法高亮库——只需引入一个 CSS 和一个 JS 文件，你的代码块就会瞬间焕发光彩。」",
+  "content": "## Prism.js 代码高亮\n\n### 引入 Prism.js (CDN)\n```html\n<link href=\"https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.css\" rel=\"stylesheet\" />\n<script src=\"https://cdn.jsdelivr.net/npm/prismjs@1/prism.js\"></script>\n```\n\n### 使用方法\n```html\n<pre><code class=\"language-python\">\ndef hello():\n    print(\"Hello, World!\")\n</code></pre>\n```\n\nPrism.js 会在页面加载后自动高亮所有 `<code>` 块。只需添加 `class=\"language-xxx\"` 指定语言。\n\n### 支持的语言\n- `language-python`\n- `language-javascript`\n- `language-html`\n- `language-css`\n- 更多……",
+  "tasks": [
+    {
+      "id": "task_23_01",
+      "order": 1,
+      "description": "### 任务一：基础高亮\n\n创建一个 HTML 文件，用 CDN 引入 Prism.js（Tomorrow 主题），展示一段 Python 代码：\n```python\ndef greet(name):\n    return f\"Hello, {name}!\"\n```\n\n**要求**：HTML 源码中包含 `\"language-python\"` 和 `\"prism.js\"`。",
+      "starter_code": "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Code Highlight</title>\n  <link href=\"https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.css\" rel=\"stylesheet\" />\n</head>\n<body>\n  <!-- 在这里添加代码块 -->\n  <script src=\"https://cdn.jsdelivr.net/npm/prismjs@1/prism.js\"></script>\n</body>\n</html>\n",
+      "test_cases": [
+        {
+          "type": "html_check",
+          "expected_body_contains": "language-python",
+          "description": "包含 Python 代码块"
+        },
+        {
+          "type": "html_check",
+          "expected_body_contains": "prism.js",
+          "description": "引入了 Prism.js"
+        }
+      ],
+      "hints": [
+        "用 <pre><code class=\"language-python\">...</code></pre> 包裹代码",
+        "Prism.js CDN: https://cdn.jsdelivr.net/npm/prismjs@1/prism.js",
+        "CSS 放在 <head>，JS 放在 </body> 前"
+      ]
+    },
+    {
+      "id": "task_23_02",
+      "order": 2,
+      "description": "### 任务二：多语言展示\n\n在上一个任务基础上，添加第二个代码块：JavaScript 代码。\n```javascript\nconst btn = document.querySelector('button');\nbtn.addEventListener('click', () => {\n    console.log('Clicked!');\n});\n```\n\n**要求**：HTML 源码中同时包含 `\"language-python\"` 和 `\"language-javascript\"`。",
+      "starter_code": "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Multi Language</title>\n  <link href=\"https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.css\" rel=\"stylesheet\" />\n</head>\n<body>\n  <h1>代码展示</h1>\n  <!-- Python 代码块 -->\n  \n  <!-- JavaScript 代码块 -->\n  \n  <script src=\"https://cdn.jsdelivr.net/npm/prismjs@1/prism.js\"></script>\n</body>\n</html>\n",
+      "test_cases": [
+        {
+          "type": "html_check",
+          "expected_body_contains": "language-python",
+          "description": "包含 Python 代码"
+        },
+        {
+          "type": "html_check",
+          "expected_body_contains": "language-javascript",
+          "description": "包含 JavaScript 代码"
+        }
+      ],
+      "hints": [
+        "Python: <pre><code class=\"language-python\">...</code></pre>",
+        "JavaScript: <pre><code class=\"language-javascript\">...</code></pre>",
+        "两个代码块都用 <pre> 包裹，保持格式"
+      ]
+    },
+    {
+      "id": "task_23_03",
+      "order": 3,
+      "description": "### 任务三：带行号的高亮\n\n引入 Prism.js 的 Line Numbers 插件，让代码块显示行号：\n```html\n<script src=\"https://cdn.jsdelivr.net/npm/prismjs@1/plugins/line-numbers/prism-line-numbers.min.js\"></script>\n```\n\n在 `<pre>` 标签上添加 `class=\"line-numbers\"`。\n\n**要求**：HTML 源码中包含 `\"line-numbers\"`。",
+      "starter_code": "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Line Numbers</title>\n  <link href=\"https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.css\" rel=\"stylesheet\" />\n  <link href=\"https://cdn.jsdelivr.net/npm/prismjs@1/plugins/line-numbers/prism-line-numbers.css\" rel=\"stylesheet\" />\n</head>\n<body>\n  <!-- 带行号的代码块 -->\n  \n  <script src=\"https://cdn.jsdelivr.net/npm/prismjs@1/prism.js\"></script>\n  <script src=\"https://cdn.jsdelivr.net/npm/prismjs@1/plugins/line-numbers/prism-line-numbers.min.js\"></script>\n</body>\n</html>\n",
+      "test_cases": [
+        {
+          "type": "html_check",
+          "expected_body_contains": "line-numbers",
+          "description": "包含行号插件"
+        }
+      ],
+      "hints": [
+        "<pre class=\"line-numbers\"><code class=\"language-python\">...</code></pre>",
+        "CSS 也要引入 line-numbers.css",
+        "多行代码效果更明显"
+      ]
+    }
+  ],
+  "challenge": {
+    "id": "challenge_23",
+    "order": 99,
+    "description": "### 挑战题：完整代码展示页\n\n设计一个完整的代码展示页面：\n- 使用 Prism.js + Tomorrow 主题 + 行号插件\n- 展示至少 3 个不同语言的代码块（Python、JavaScript、HTML）\n- 添加一个标题 `<h1>`\n- 添加简单的 CSS 样式美化布局\n\n**要求**：HTML 源码中包含 `\"<style>\"` 和 `\"language-python\"` 和 `\"language-javascript\"`。",
+    "starter_code": "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Code Gallery</title>\n  <!-- Prism CSS -->\n  <!-- 自定义 style -->\n</head>\n<body>\n  <h1>代码画廊</h1>\n  <!-- 3 个代码块 -->\n  \n  <!-- Prism JS -->\n</body>\n</html>\n",
+    "test_cases": [
+      {
+        "type": "html_check",
+        "expected_body_contains": "<style>",
+        "description": "包含自定义样式"
+      },
+      {
+        "type": "html_check",
+        "expected_body_contains": "language-python",
+        "description": "包含 Python 代码"
+      },
+      {
+        "type": "html_check",
+        "expected_body_contains": "language-javascript",
+        "description": "包含 JavaScript 代码"
+      }
+    ],
+    "hints": [
+      "在 <head> 中用 <style> 标签写自定义 CSS",
+      "3 个 code 块分别用 language-python/js/html",
+      "给 <body> 添加背景色和字体使页面更美观"
+    ]
+  }
+}

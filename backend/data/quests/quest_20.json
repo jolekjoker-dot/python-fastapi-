@@ -1,0 +1,109 @@
+{
+  "id": "quest_20",
+  "title": "身份之证 — JWT 用户认证",
+  "phase": 3,
+  "order": 20,
+  "xp_reward": 250,
+  "coin_reward": 100,
+  "story": "> *「全栈贤者」在魔法阵周围布下一圈守卫符文。*\n\n**全栈贤者**：「开放的魔法阵任何人都能访问。现在你需要**认证守卫**——只有持有有效令牌的人才能进入。JWT 是你签发的魔法通行证，bcrypt 将密码加密为不可逆的哈希，OAuth2 依赖注入像一道自动验证身份的魔法门。」",
+  "content": "## JWT 用户认证\n\n### 密码哈希 (bcrypt)\n```python\nimport bcrypt\n\ndef hash_password(password: str) -> str:\n    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()\n\ndef verify_password(password: str, hashed: str) -> bool:\n    return bcrypt.checkpw(password.encode(), hashed.encode())\n```\n\n### JWT 签发和验证\n```python\nimport jwt\nfrom datetime import datetime, timedelta\n\nSECRET = \"my-secret-key\"\n\ndef create_token(user_id: int) -> str:\n    payload = {\"sub\": str(user_id), \"exp\": datetime.utcnow() + timedelta(hours=1)}\n    return jwt.encode(payload, SECRET, algorithm=\"HS256\")\n\ndef decode_token(token: str) -> dict:\n    return jwt.decode(token, SECRET, algorithms=[\"HS256\"])\n```\n\n### OAuth2 依赖注入\n```python\nfrom fastapi.security import HTTPBearer\n\nsecurity = HTTPBearer()\n\nasync def get_current_user(credentials = Depends(security)):\n    payload = decode_token(credentials.credentials)\n    user_id = int(payload[\"sub\"])\n    return user_id\n```",
+  "tasks": [
+    {
+      "id": "task_20_01",
+      "order": 1,
+      "description": "### 任务一：注册接口\n\n创建 `POST /register` 接口：\n- 接收 `{\"username\": \"xxx\", \"password\": \"xxx\"}`\n- 密码用 bcrypt 哈希后存储到字典\n- 返回 `{\"message\": \"注册成功\", \"user_id\": 1}`\n\n测试用 curl 注册一个用户。\n\n**要求**：POST /register 返回 201。",
+      "starter_code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\nimport bcrypt\n\napp = FastAPI()\n\nusers = {}\nnext_id = 1\n\nclass UserRegister(BaseModel):\n    username: str\n    password: str\n\n# POST /register (status_code=201)\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "POST",
+          "path": "/register",
+          "expected_status": 201,
+          "expected_body_contains": "注册成功",
+          "body": {"username": "mago", "password": "secret123"},
+          "description": "注册成功返回 201"
+        }
+      ],
+      "hints": [
+        "from pydantic import BaseModel",
+        "hashed = bcrypt.hashpw(data.password.encode(), bcrypt.gensalt()).decode()",
+        "users[next_id] = {\"id\": next_id, \"username\": data.username, \"password_hash\": hashed}"
+      ]
+    },
+    {
+      "id": "task_20_02",
+      "order": 2,
+      "description": "### 任务二：登录 + JWT 签发\n\n添加 `POST /login` 接口：\n- 接收 username 和 password\n- 验证密码（bcrypt.checkpw）\n- 验证通过后签发 JWT 令牌\n- 返回 `{\"access_token\": \"xxx\", \"token_type\": \"bearer\"}`\n\n先在 /register 注册，再用 /login 登录获取 token。\n\n**要求**：POST /login 返回 200 + access_token。",
+      "starter_code": "from fastapi import FastAPI, HTTPException\nfrom pydantic import BaseModel\nimport bcrypt\nimport jwt\nfrom datetime import datetime, timedelta\n\napp = FastAPI()\n\nSECRET = \"quest-secret-key\"\nusers = {}\nnext_id = 1\n\nclass UserRegister(BaseModel):\n    username: str\n    password: str\n\n@app.post(\"/register\", status_code=201)\nasync def register(data: UserRegister):\n    global next_id\n    hashed = bcrypt.hashpw(data.password.encode(), bcrypt.gensalt()).decode()\n    users[next_id] = {\"id\": next_id, \"username\": data.username, \"password_hash\": hashed}\n    next_id += 1\n    return {\"message\": \"注册成功\", \"user_id\": next_id - 1}\n\n# POST /login\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "POST",
+          "path": "/register",
+          "expected_status": 201,
+          "expected_body_contains": "注册成功",
+          "body": {"username": "wizard", "password": "abracadabra"},
+          "description": "先注册"
+        },
+        {
+          "type": "http_test",
+          "method": "POST",
+          "path": "/login",
+          "expected_status": 200,
+          "expected_body_contains": "access_token",
+          "body": {"username": "wizard", "password": "abracadabra"},
+          "description": "登录获取 token"
+        }
+      ],
+      "hints": [
+        "遍历 users 找到 username 匹配的用户",
+        "bcrypt.checkpw(data.password.encode(), user[\"password_hash\"].encode())",
+        "payload = {\"sub\": str(user[\"id\"]), \"exp\": datetime.utcnow() + timedelta(hours=1)}",
+        "return {\"access_token\": jwt.encode(payload, SECRET, algorithm=\"HS256\"), \"token_type\": \"bearer\"}"
+      ]
+    },
+    {
+      "id": "task_20_03",
+      "order": 3,
+      "description": "### 任务三：受保护的路由\n\n创建 `GET /me` 路由，需要 Bearer Token 认证：\n- 从 Authorization header 提取 token\n- 解码 JWT 获取 user_id\n- 返回用户信息（不含密码）\n\n创建 `GET /public` 路由，不需要认证，返回 `{\"msg\": \"公开信息\"}`。\n\n**要求**：带 token 访问 /me 返回用户信息。",
+      "starter_code": "from fastapi import FastAPI, HTTPException, Depends\nfrom fastapi.security import HTTPBearer\nfrom pydantic import BaseModel\nimport bcrypt\nimport jwt\n\napp = FastAPI()\n\nSECRET = \"quest-secret-key\"\nsecurity = HTTPBearer()\nusers = {\"1\": {\"id\": 1, \"username\": \"admin\", \"password_hash\": bcrypt.hashpw(\"admin\".encode(), bcrypt.gensalt()).decode()}}\n\n# 注册时创建了 admin 用户，密码 \"admin\"\n\ndef decode_token(token: str):\n    return jwt.decode(token, SECRET, algorithms=[\"HS256\"])\n\ndef get_current_user(credentials = Depends(security)):\n    payload = decode_token(credentials.credentials)\n    return int(payload[\"sub\"])\n\n@app.post(\"/login\")\nasync def login(data: dict):\n    # 简化版：直接签发 token\n    payload = {\"sub\": \"1\", \"exp\": __import__(\"datetime\").datetime.utcnow() + __import__(\"datetime\").timedelta(hours=1)}\n    return {\"access_token\": jwt.encode(payload, SECRET, algorithm=\"HS256\"), \"token_type\": \"bearer\"}\n\n# GET /me (受保护)\n\n# GET /public (公开)\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/public",
+          "expected_status": 200,
+          "expected_body_contains": "公开信息",
+          "description": "公开路由无需认证"
+        }
+      ],
+      "hints": [
+        "@app.get(\"/me\")",
+        "async def me(user_id=Depends(get_current_user)):",
+        "return {\"id\": user_id, \"username\": users[str(user_id)][\"username\"]}"
+      ]
+    }
+  ],
+  "challenge": {
+    "id": "challenge_20",
+    "order": 99,
+    "description": "### 挑战题：完整认证系统\n\n整合前面的代码，实现：\n1. POST /register — 注册\n2. POST /login — 登录返回 JWT\n3. GET /me — 受保护，返回当前用户信息\n4. GET /users — 受保护，返回所有用户列表（脱敏，不含密码）\n\n先注册，再登录获取 token，访问 /me 和 /users。\n\n**要求**：/users 返回用户列表（不含 password_hash）。",
+    "starter_code": "from fastapi import FastAPI, HTTPException, Depends\nfrom fastapi.security import HTTPBearer\nfrom pydantic import BaseModel\nimport bcrypt, jwt\nfrom datetime import datetime, timedelta\n\napp = FastAPI()\nSECRET = \"quest-secret-key\"\nsecurity = HTTPBearer()\nusers = {}\nnext_id = 1\n\nclass UserAuth(BaseModel):\n    username: str\n    password: str\n\ndef decode_token(token: str):\n    return jwt.decode(token, SECRET, algorithms=[\"HS256\"])\n\ndef get_current_user(credentials = Depends(security)):\n    return int(decode_token(credentials.credentials)[\"sub\"])\n\n# POST /register\n\n# POST /login\n\n# GET /me\n\n# GET /users\n",
+    "test_cases": [
+      {
+        "type": "http_test",
+        "method": "POST",
+        "path": "/register",
+        "expected_status": 201,
+        "expected_body_contains": "注册成功",
+        "body": {"username": "mage", "password": "test123"},
+        "description": "注册用户"
+      }
+    ],
+    "hints": [
+      "GET /users: 遍历 users.values()，返回不含 password_hash 的列表",
+      "返回格式: [{\"id\": u[\"id\"], \"username\": u[\"username\"]} for u in users.values()]",
+      "所有受保护路由加上 user_id=Depends(get_current_user)"
+    ]
+  }
+}

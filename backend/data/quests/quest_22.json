@@ -1,0 +1,87 @@
+{
+  "id": "quest_22",
+  "title": "信使之翼 — API 客户端实战",
+  "phase": 3,
+  "order": 22,
+  "xp_reward": 200,
+  "coin_reward": 80,
+  "story": "> *「全栈贤者」打开一个精致的木盒，里面躺着一只机械信使鸟。*\n\n**全栈贤者**：「前端组件需要通过**HTTP 客户端**与后端通信。你之前用过的 `httpx` 或 `requests` 就是这样的信使。今天，你要亲手打造一个封装好的 API 客户端类——它会自动处理请求头、序列化 JSON、优雅地报告错误。」",
+  "content": "## 构建 API 客户端类\n\n### 封装 requests\n```python\nimport requests\n\nclass APIClient:\n    def __init__(self, base_url: str):\n        self.base_url = base_url\n\n    def get(self, path: str) -> dict:\n        resp = requests.get(f\"{self.base_url}{path}\")\n        return resp.json()\n\n    def post(self, path: str, data: dict) -> dict:\n        resp = requests.post(f\"{self.base_url}{path}\", json=data)\n        return resp.json()\n```\n\n### 错误处理\n```python\ndef get(self, path: str) -> dict:\n    resp = requests.get(f\"{self.base_url}{path}\")\n    if resp.status_code != 200:\n        raise Exception(f\"请求失败: {resp.status_code}\")\n    return resp.json()\n```\n\n### 类型注解\n```python\ndef post(self, path: str, data: dict) -> dict:\n    ...\n```",
+  "tasks": [
+    {
+      "id": "task_22_01",
+      "order": 1,
+      "description": "### 任务一：基础 GET 请求\n\n使用 `urllib.request`（标准库，无需安装）写一个函数 `fetch_json(url: str) -> dict`：\n- 发送 GET 请求到 url\n- 解析 JSON 响应并返回\n\n调用 `fetch_json(\"https://httpbin.org/json\")` 并打印返回的字典。\n\n**要求**：输出包含 `\"slideshow\"`（httpbin.org/json 返回的固定内容）。",
+      "starter_code": "from urllib.request import urlopen\nimport json\n\n# 定义 fetch_json 函数\n\n# 调用并打印结果\n",
+      "test_cases": [
+        {
+          "type": "output_contains",
+          "expected": "slideshow",
+          "input_data": "",
+          "description": "成功获取并解析 JSON"
+        }
+      ],
+      "hints": [
+        "from urllib.request import urlopen",
+        "resp = urlopen(url); return json.loads(resp.read())",
+        "print(fetch_json(\"https://httpbin.org/json\"))"
+      ]
+    },
+    {
+      "id": "task_22_02",
+      "order": 2,
+      "description": "### 任务二：APIClient 类\n\n定义一个 `APIClient` 类：\n- `__init__(self, base_url: str)` — 保存基础 URL\n- `get(self, path: str) -> dict` — 执行 GET 请求，解析 JSON 返回\n- `post(self, path: str, data: dict) -> dict` — 执行 POST 请求\n\n写完后，创建客户端并用 `print()` 打印 `client.base_url`。\n\n**要求**：输出 `\"https://api.example.com\"`。",
+      "starter_code": "# 定义 APIClient 类\n\n\n# 创建实例并打印 base_url\n",
+      "test_cases": [
+        {
+          "type": "output_contains",
+          "expected": "https://api.example.com",
+          "input_data": "",
+          "description": "创建客户端并输出 base_url"
+        }
+      ],
+      "hints": [
+        "class APIClient:",
+        "def __init__(self, base_url: str): self.base_url = base_url",
+        "client = APIClient(\"https://api.example.com\"); print(client.base_url)"
+      ]
+    },
+    {
+      "id": "task_22_03",
+      "order": 3,
+      "description": "### 任务三：错误处理\n\n给 `APIClient.get()` 添加错误处理：\n- 如果状态码不是 200，抛出 `Exception(f\"请求失败: {status_code}\")`\n- 如果 JSON 解析失败，抛出 `Exception(\"响应不是有效的 JSON\")`\n\n写一个测试：尝试请求一个不存在的路径，用 try/except 捕获异常并打印 `\"错误: {异常信息}\"`。\n\n**要求**：输出包含 `\"错误:\"`。",
+      "starter_code": "from urllib.request import urlopen\nfrom urllib.error import HTTPError\nimport json\n\n# 完整 APIClient 类（含错误处理）\n\n\n# 测试：请求不存在的路径，捕获异常\n",
+      "test_cases": [
+        {
+          "type": "output_contains",
+          "expected": "错误:",
+          "input_data": "",
+          "description": "错误被正确捕获"
+        }
+      ],
+      "hints": [
+        "class APIClient: def get(self, path): try: resp=urlopen(...); return json.loads(resp.read()); except HTTPError as e: raise Exception(f\"请求失败: {e.code}\")",
+        "测试: try: client.get(\"/nonexistent\"); except Exception as e: print(f\"错误: {e}\")"
+      ]
+    }
+  ],
+  "challenge": {
+    "id": "challenge_22",
+    "order": 99,
+    "description": "### 挑战题：完整 TodoAPIClient\n\n创建一个 `TodoAPIClient` 类，继承或封装 APIClient：\n- `get_todos() -> list` — GET /todos\n- `create_todo(title: str) -> dict` — POST /todos\n- `delete_todo(todo_id: int) -> bool` — DELETE /todos/{id}\n\n写完整，并用 print 证明类结构正确。\n\n**要求**：代码中同时包含 `get_todos` 和 `create_todo` 和 `delete_todo` 三个方法定义。",
+    "starter_code": "# 定义 TodoAPIClient 类\n\n\n# 用 print 证明结构\n",
+    "test_cases": [
+      {
+        "type": "output_contains",
+        "expected": "TodoAPIClient",
+        "input_data": "",
+        "description": "包含 TodoAPIClient 类"
+      }
+    ],
+    "hints": [
+      "class TodoAPIClient: def __init__(self, base_url): ...",
+      "三个方法分别封装 GET、POST、DELETE",
+      "print(TodoAPIClient.__name__) 打印类名证明"
+    ]
+  }
+}

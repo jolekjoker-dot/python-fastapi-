@@ -97,7 +97,7 @@
           "method": "PATCH",
           "path": "/todos/1/complete",
           "expected_status": 200,
-          "expected_body_contains": "\"completed\": true",
+          "expected_body_contains": "\"completed\":true",
           "description": "标记完成"
         }
       ],

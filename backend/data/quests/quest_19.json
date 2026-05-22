@@ -1,0 +1,142 @@
+{
+  "id": "quest_19",
+  "title": "记忆水晶 — SQLite + SQLAlchemy",
+  "phase": 3,
+  "order": 19,
+  "xp_reward": 200,
+  "coin_reward": 80,
+  "story": "> *「全栈贤者」从怀中取出一颗泛着微光的蓝色水晶。*\n\n**全栈贤者**：「这是**记忆水晶**——SQLite 数据库。迄今为止，你的数据在服务重启后就会消散。这颗水晶能将数据永久铭刻。而 **SQLAlchemy** 是你与水晶对话的通用语言——用 Python 类描述表结构，用 Session 执行 CRUD 操作。」\n\n**全栈贤者**：「现在，将你的 Todo 数据从内存字典迁移到这颗水晶中。」",
+  "content": "## SQLite + SQLAlchemy\n\n### SQLAlchemy 模型定义\n```python\nfrom sqlalchemy import create_engine, Column, Integer, String, Float\nfrom sqlalchemy.orm import DeclarativeBase, Session\n\nclass Base(DeclarativeBase):\n    pass\n\nclass Item(Base):\n    __tablename__ = \"items\"\n    id = Column(Integer, primary_key=True)\n    name = Column(String(100), nullable=False)\n    price = Column(Float, default=0.0)\n```\n\n### 创建引擎和表\n```python\nengine = create_engine(\"sqlite:///./items.db\", echo=False)\nBase.metadata.create_all(engine)\n```\n\n### Session CRUD\n```python\nwith Session(engine) as session:\n    # Create\n    item = Item(name=\"魔杖\", price=150.0)\n    session.add(item)\n    session.commit()\n\n    # Read\n    items = session.query(Item).all()\n\n    # Update\n    item.price = 200.0\n    session.commit()\n\n    # Delete\n    session.delete(item)\n    session.commit()\n```",
+  "tasks": [
+    {
+      "id": "task_19_01",
+      "order": 1,
+      "description": "### 任务一：定义模型 + 建表\n\n使用 SQLAlchemy 定义 `Spell` 模型：\n- `__tablename__ = \"spells\"`\n- `id: int` (主键)\n- `name: str` (不能为空)\n- `power: int` (默认 0)\n\n创建 SQLite 引擎（连接到 `spells.db`）并建表。\n\n然后创建 `GET /init` 路由，建表并返回 `{\"ok\": true}`。\n\n**要求**：GET /init 返回 200。",
+      "starter_code": "from fastapi import FastAPI\nfrom sqlalchemy import create_engine, Column, Integer, String\nfrom sqlalchemy.orm import DeclarativeBase, Session\n\napp = FastAPI()\n\nclass Base(DeclarativeBase):\n    pass\n\n# 定义 Spell 模型\n\n# 创建引擎\n\n# GET /init 建表\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/init",
+          "expected_status": 200,
+          "expected_body_contains": "\"ok\":true",
+          "description": "建表成功"
+        }
+      ],
+      "hints": [
+        "class Spell(Base): __tablename__ = \"spells\"",
+        "id = Column(Integer, primary_key=True)",
+        "engine = create_engine(\"sqlite:///./spells.db\")",
+        "Base.metadata.create_all(engine)"
+      ]
+    },
+    {
+      "id": "task_19_02",
+      "order": 2,
+      "description": "### 任务二：创建和查询\n\n添加 `POST /spells` 路由，接收咒语数据并存入数据库：\n```json\n{\"name\": \"火球术\", \"power\": 80}\n```\n\n添加 `GET /spells` 路由，从数据库查询所有咒语并返回列表。\n\n先 POST 创建一条，再 GET 验证。\n\n**要求**：POST 返回 201，GET 能看到刚创建的记录。",
+      "starter_code": "from fastapi import FastAPI\nfrom pydantic import BaseModel\nfrom sqlalchemy import create_engine, Column, Integer, String\nfrom sqlalchemy.orm import DeclarativeBase, Session\n\napp = FastAPI()\n\nclass Base(DeclarativeBase): pass\n\nclass Spell(Base):\n    __tablename__ = \"spells\"\n    id = Column(Integer, primary_key=True)\n    name = Column(String, nullable=False)\n    power = Column(Integer, default=0)\n\nengine = create_engine(\"sqlite:///./spells.db\", echo=False)\nBase.metadata.create_all(engine)\n\nclass SpellCreate(BaseModel):\n    name: str\n    power: int = 0\n\n# POST /spells\n\n# GET /spells\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "POST",
+          "path": "/spells",
+          "expected_status": 201,
+          "expected_body_contains": "火球术",
+          "body": {"name": "火球术", "power": 80},
+          "description": "POST 创建咒语"
+        },
+        {
+          "type": "http_test",
+          "method": "GET",
+          "path": "/spells",
+          "expected_status": 200,
+          "expected_body_contains": "火球术",
+          "description": "GET 查询包含刚创建的"
+        }
+      ],
+      "hints": [
+        "POST: with Session(engine) as s: spell = Spell(**data); s.add(spell); s.commit()",
+        "返回创建的对象需要用 s.refresh(spell) 或直接构建响应",
+        "GET: with Session(engine) as s: return s.query(Spell).all()"
+      ]
+    },
+    {
+      "id": "task_19_03",
+      "order": 3,
+      "description": "### 任务三：更新和删除\n\n添加 `PUT /spells/{spell_id}` 更新咒语（修改 name 和 power）。\n\n添加 `DELETE /spells/{spell_id}` 删除咒语（status_code=204）。\n\n先 POST 创建一条，再 PUT 更新，GET 验证更新结果。\n\n**要求**：PUT 返回更新后的数据，DELETE 返回 204。",
+      "starter_code": "from fastapi import FastAPI, HTTPException\nfrom pydantic import BaseModel\nfrom sqlalchemy import create_engine, Column, Integer, String\nfrom sqlalchemy.orm import DeclarativeBase, Session\n\napp = FastAPI()\n\nclass Base(DeclarativeBase): pass\nclass Spell(Base):\n    __tablename__ = \"spells\"\n    id = Column(Integer, primary_key=True)\n    name = Column(String, nullable=False)\n    power = Column(Integer, default=0)\n\nengine = create_engine(\"sqlite:///./spells.db\", echo=False)\nBase.metadata.create_all(engine)\n\nclass SpellCreate(BaseModel):\n    name: str\n    power: int = 0\n\n@app.post(\"/spells\", status_code=201)\nasync def create(data: SpellCreate):\n    with Session(engine) as s:\n        spell = Spell(name=data.name, power=data.power)\n        s.add(spell)\n        s.commit()\n        s.refresh(spell)\n        return {\"id\": spell.id, \"name\": spell.name, \"power\": spell.power}\n\n@app.get(\"/spells\")\nasync def get_all():\n    with Session(engine) as s:\n        spells = s.query(Spell).all()\n        return [{\"id\": s.id, \"name\": s.name, \"power\": s.power} for s in spells]\n\n# PUT /spells/{spell_id}\n\n# DELETE /spells/{spell_id}\n",
+      "test_cases": [
+        {
+          "type": "http_test",
+          "method": "POST",
+          "path": "/spells",
+          "expected_status": 201,
+          "expected_body_contains": "旧咒语",
+          "body": {"name": "旧咒语", "power": 10},
+          "description": "创建待更新的咒语"
+        },
+        {
+          "type": "http_test",
+          "method": "PUT",
+          "path": "/spells/1",
+          "expected_status": 200,
+          "expected_body_contains": "新咒语",
+          "body": {"name": "新咒语", "power": 99},
+          "description": "更新咒语名"
+        },
+        {
+          "type": "http_test",
+          "method": "DELETE",
+          "path": "/spells/1",
+          "expected_status": 204,
+          "expected_body_contains": "",
+          "description": "删除返回 204"
+        }
+      ],
+      "hints": [
+        "PUT: 先 query(Spell).filter(Spell.id == spell_id).first() 找到记录",
+        "修改属性后 s.commit()",
+        "DELETE: s.delete(spell); s.commit(); return None"
+      ]
+    }
+  ],
+  "challenge": {
+    "id": "challenge_19",
+    "order": 99,
+    "description": "### 挑战题：完整 CRUD + 搜索\n\n将上述代码整合，并添加搜索功能：\n- `GET /spells/search?keyword=xxx` — 按名称模糊搜索（包含关键字即可）\n\n先创建两条咒语（不同 name），再用搜索验证。\n\n**要求**：搜索某关键字只返回匹配的记录。",
+    "starter_code": "from fastapi import FastAPI, HTTPException, Query\nfrom pydantic import BaseModel\nfrom sqlalchemy import create_engine, Column, Integer, String\nfrom sqlalchemy.orm import DeclarativeBase, Session\n\napp = FastAPI()\n\nclass Base(DeclarativeBase): pass\nclass Spell(Base):\n    __tablename__ = \"spells\"\n    id = Column(Integer, primary_key=True)\n    name = Column(String, nullable=False)\n    power = Column(Integer, default=0)\n\nengine = create_engine(\"sqlite:///./spells.db\", echo=False)\nBase.metadata.create_all(engine)\n\nclass SpellCreate(BaseModel):\n    name: str\n    power: int = 0\n\n@app.post(\"/spells\", status_code=201)\nasync def create(data: SpellCreate):\n    with Session(engine) as s:\n        spell = Spell(name=data.name, power=data.power)\n        s.add(spell)\n        s.commit()\n        s.refresh(spell)\n        return {\"id\": spell.id, \"name\": spell.name, \"power\": spell.power}\n\n@app.get(\"/spells\")\nasync def get_all():\n    with Session(engine) as s:\n        spells = s.query(Spell).all()\n        return [{\"id\": s.id, \"name\": s.name, \"power\": s.power} for s in spells]\n\n# GET /spells/search?keyword=xxx\n",
+    "test_cases": [
+      {
+        "type": "http_test",
+        "method": "POST",
+        "path": "/spells",
+        "expected_status": 201,
+        "expected_body_contains": "火",
+        "body": {"name": "火球术", "power": 80},
+        "description": "创建火球术"
+      },
+      {
+        "type": "http_test",
+        "method": "POST",
+        "path": "/spells",
+        "expected_status": 201,
+        "expected_body_contains": "冰",
+        "body": {"name": "冰箭术", "power": 60},
+        "description": "创建冰箭术"
+      },
+      {
+        "type": "http_test",
+        "method": "GET",
+        "path": "/spells/search?keyword=火",
+        "expected_status": 200,
+        "expected_body_contains": "火球术",
+        "description": "搜索到火球术"
+      }
+    ],
+    "hints": [
+      "Filter: s.query(Spell).filter(Spell.name.contains(keyword)).all()",
+      "参数: keyword: str = Query(...)",
+      "返回和 GET /spells 相同的格式"
+    ]
+  }
+}
