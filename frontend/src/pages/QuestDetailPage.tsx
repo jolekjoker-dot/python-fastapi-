@@ -23,7 +23,7 @@ export function QuestDetailPage() {
   const { user } = useUserStore()
 
   const leftPanel = usePanelResize(320, 220, 560)
-  const rightPanel = usePanelResize(320, 240, 500)
+  const rightPanel = usePanelResize(320, 240, 500, true)
 
   // Load quest
   useEffect(() => {

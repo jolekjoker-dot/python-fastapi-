@@ -1,8 +1,14 @@
 import { useState, useCallback, useEffect } from 'react'
 
-export function usePanelResize(initial: number, min: number, max: number) {
+export function usePanelResize(
+  initial: number,
+  min: number,
+  max: number,
+  reverse = false,
+) {
   const [width, setWidth] = useState(initial)
   const [dragging, setDragging] = useState(false)
+  const sign = reverse ? -1 : 1
 
   const onMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
@@ -14,7 +20,7 @@ export function usePanelResize(initial: number, min: number, max: number) {
 
     const onMouseMove = (e: MouseEvent) => {
       setWidth((prev) => {
-        const next = prev + e.movementX
+        const next = prev + e.movementX * sign
         return Math.max(min, Math.min(max, next))
       })
     }

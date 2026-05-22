@@ -27,7 +27,7 @@ export function PlaygroundPage() {
   const [running, setRunning] = useState(false)
 
   const leftPanel = usePanelResize(288, 200, 500)
-  const rightPanel = usePanelResize(320, 240, 500)
+  const rightPanel = usePanelResize(320, 240, 500, true)
 
   const handleRun = useCallback(async () => {
     setRunning(true)
