@@ -3,6 +3,8 @@ import { TopNav } from '../components/layout/TopNav'
 import { TutorialPanel } from '../components/layout/TutorialPanel'
 import { CodeEditor } from '../components/editor/CodeEditor'
 import { OutputConsole } from '../components/output/OutputConsole'
+import { ResizeHandle } from '../components/ui/ResizeHandle'
+import { usePanelResize } from '../hooks/usePanelResize'
 import { executeCode } from '../api/execute'
 import type { ExecutionResult } from '../types/code'
 
@@ -23,6 +25,9 @@ export function PlaygroundPage() {
   const [code, setCode] = useState(DEFAULT_CODE)
   const [result, setResult] = useState<ExecutionResult | null>(null)
   const [running, setRunning] = useState(false)
+
+  const leftPanel = usePanelResize(288, 200, 500)
+  const rightPanel = usePanelResize(320, 240, 500)
 
   const handleRun = useCallback(async () => {
     setRunning(true)
@@ -48,9 +53,14 @@ export function PlaygroundPage() {
       <TopNav />
       <div className="flex-1 flex overflow-hidden">
         {/* Tutorial Panel (Left) */}
-        <div className="w-72 shrink-0 border-r border-text-muted/20 bg-surface-panel/50 overflow-hidden">
+        <div
+          className="shrink-0 border-r border-text-muted/20 bg-surface-panel/50 overflow-hidden"
+          style={{ width: leftPanel.width }}
+        >
           <TutorialPanel />
         </div>
+
+        <ResizeHandle onMouseDown={leftPanel.onMouseDown} dragging={leftPanel.dragging} />
 
         {/* Code Editor (Center) */}
         <div className="flex-1 min-w-0 overflow-hidden">
@@ -62,8 +72,13 @@ export function PlaygroundPage() {
           />
         </div>
 
+        <ResizeHandle onMouseDown={rightPanel.onMouseDown} dragging={rightPanel.dragging} />
+
         {/* Output Console (Right) */}
-        <div className="w-80 shrink-0 border-l border-text-muted/20 bg-surface-dark overflow-hidden">
+        <div
+          className="shrink-0 border-l border-text-muted/20 bg-surface-dark overflow-hidden"
+          style={{ width: rightPanel.width }}
+        >
           <OutputConsole result={result} />
         </div>
       </div>

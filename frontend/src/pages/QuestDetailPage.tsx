@@ -4,6 +4,8 @@ import { getQuest, submitTask } from '../api/quests'
 import type { QuestData, QuestTask, TaskSubmitResult } from '../types/quest'
 import { TopNav } from '../components/layout/TopNav'
 import { CodeEditor } from '../components/editor/CodeEditor'
+import { ResizeHandle } from '../components/ui/ResizeHandle'
+import { usePanelResize } from '../hooks/usePanelResize'
 import ReactMarkdown from 'react-markdown'
 import toast from 'react-hot-toast'
 import { useUserStore } from '../stores/userStore'
@@ -19,6 +21,9 @@ export function QuestDetailPage() {
   const [result, setResult] = useState<TaskSubmitResult | null>(null)
   const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set())
   const { user } = useUserStore()
+
+  const leftPanel = usePanelResize(320, 220, 560)
+  const rightPanel = usePanelResize(320, 240, 500)
 
   // Load quest
   useEffect(() => {
@@ -120,7 +125,10 @@ export function QuestDetailPage() {
       <TopNav />
       <div className="flex-1 flex overflow-hidden">
         {/* Left: Tutorial Panel */}
-        <div className="w-80 shrink-0 border-r border-text-muted/20 bg-surface-panel/50 overflow-hidden flex flex-col">
+        <div
+          className="shrink-0 border-r border-text-muted/20 bg-surface-panel/50 overflow-hidden flex flex-col"
+          style={{ width: leftPanel.width }}
+        >
           <div className="px-4 py-2 bg-surface-panel border-b border-text-muted/20 shrink-0 flex items-center justify-between">
             <button
               onClick={() => navigate('/map')}
@@ -187,6 +195,9 @@ export function QuestDetailPage() {
           </div>
         </div>
 
+        {/* Left ↔ Center resize handle */}
+        <ResizeHandle onMouseDown={leftPanel.onMouseDown} dragging={leftPanel.dragging} />
+
         {/* Center: Code Editor */}
         <div className="flex-1 min-w-0 overflow-hidden">
           <CodeEditor
@@ -197,8 +208,14 @@ export function QuestDetailPage() {
           />
         </div>
 
+        {/* Center ↔ Right resize handle */}
+        <ResizeHandle onMouseDown={rightPanel.onMouseDown} dragging={rightPanel.dragging} />
+
         {/* Right: Test Results */}
-        <div className="w-80 shrink-0 border-l border-text-muted/20 bg-surface-dark overflow-hidden flex flex-col">
+        <div
+          className="shrink-0 border-l border-text-muted/20 bg-surface-dark overflow-hidden flex flex-col"
+          style={{ width: rightPanel.width }}
+        >
           <div className="px-4 py-2 bg-surface-panel border-b border-text-muted/20 shrink-0">
             <span className="text-sm text-text-muted">Test Results</span>
           </div>
