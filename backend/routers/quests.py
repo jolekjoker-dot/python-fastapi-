@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import func
 
 from backend.database import get_db
+from backend.models.execution import ExecutionHistory
 from backend.models.progress import Progress
 from backend.models.user import User
 from backend.schemas.quest import (
@@ -51,6 +52,19 @@ async def submit_task(
     db: AsyncSession = Depends(get_db),
 ):
     result = check_task(quest_id, submit)
+
+    # Save execution history
+    hist = ExecutionHistory(
+        user_id=current_user.id,
+        quest_id=quest_id,
+        task_id=submit.task_id,
+        code=submit.code,
+        stdout=result.stdout,
+        stderr=result.stderr,
+        passed=result.passed,
+        execution_time=result.execution_time,
+    )
+    db.add(hist)
 
     if result.passed:
         result2 = await db.execute(

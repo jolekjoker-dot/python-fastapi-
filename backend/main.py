@@ -4,8 +4,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.database import init_db
-from backend.models import Progress, User  # noqa: F401  register models
-from backend.routers import auth, execute, quests
+from backend.models import (
+    CodeDraft, ExecutionHistory, Progress, User, UserPreference  # noqa: F401
+)
+from backend.routers import auth, execute, persistence, quests
 
 
 @asynccontextmanager
@@ -32,6 +34,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(execute.router)
 app.include_router(quests.router)
+app.include_router(persistence.router)
 
 
 @app.get("/")
