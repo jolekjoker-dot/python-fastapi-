@@ -4,6 +4,8 @@ import { Toaster } from 'react-hot-toast'
 import { useUserStore } from './stores/userStore'
 import { LoginPage } from './pages/LoginPage'
 import { PlaygroundPage } from './pages/PlaygroundPage'
+import { QuestMapPage } from './pages/QuestMapPage'
+import { QuestDetailPage } from './pages/QuestDetailPage'
 
 export default function App() {
   const { user, restore, loading } = useUserStore()
@@ -24,7 +26,9 @@ export default function App() {
     <BrowserRouter>
       <Toaster position="top-right" toastOptions={{ style: { background: '#16213e', color: '#e0e0e0' } }} />
       <Routes>
-        <Route path="/" element={user ? <Navigate to="/playground" /> : <LoginPage />} />
+        <Route path="/" element={user ? <Navigate to="/map" /> : <LoginPage />} />
+        <Route path="/map" element={user ? <QuestMapPage /> : <Navigate to="/" />} />
+        <Route path="/quest/:questId" element={user ? <QuestDetailPage /> : <Navigate to="/" />} />
         <Route path="/playground" element={user ? <PlaygroundPage /> : <Navigate to="/" />} />
       </Routes>
     </BrowserRouter>

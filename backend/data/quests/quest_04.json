@@ -1,0 +1,88 @@
+{
+  "id": "quest_04",
+  "title": "咒语之书 — 函数",
+  "phase": 1,
+  "order": 4,
+  "xp_reward": 180,
+  "coin_reward": 70,
+  "story": "> *派森大师带你走进学院图书馆，书架上摆满了发光的咒语书。*\n\n**派森大师**：「这些书中记录着历代法师编写的**函数**——一段可以反复调用的咒语。`def` 关键字定义函数，参数是输入，`return` 是输出。写好一个函数，就能在需要时随时吟唱。」\n\n**比特精灵**：「函数就像微波炉的预设程序——放进去食材，按一个按钮，自动做好的菜就出来了！」",
+  "content": "## 函数 — 可复用的咒语\n\n### 定义和调用\n```python\ndef greet(name):\n    return f\"你好，{name}！\"\n\nresult = greet(\"小明\")\nprint(result)  # 你好，小明！\n```\n\n### 默认参数\n```python\ndef cast_spell(name, power=50):\n    return f\"释放 {name}，威力 {power}\"\n\nprint(cast_spell(\"火球术\"))       # 威力 50（默认值）\nprint(cast_spell(\"火球术\", 100))  # 威力 100（覆盖默认值）\n```\n\n### *args — 可变数量参数\n```python\ndef mix_potions(*ingredients):\n    return \" + \".join(ingredients)\n\nprint(mix_potions(\"龙鳞\", \"月光草\", \"凤凰羽毛\"))\n# 龙鳞 + 月光草 + 凤凰羽毛\n```\n\n### 返回值\n- 用 `return` 返回结果\n- 没有 `return` 的函数默认返回 `None`\n- 可以返回多个值：`return a, b`",
+  "tasks": [
+    {
+      "id": "task_01",
+      "order": 1,
+      "description": "### 任务一：编写 cast_spell() 函数\n\n定义一个函数 `cast_spell(spell_name)`，接收咒语名，返回字符串 `\"施放法术：{spell_name}！\"`。\n\n然后调用 `cast_spell(\"火球术\")`，用 `print()` 打印结果。\n\n**要求**：输出 `\"施放法术：火球术！\"`",
+      "starter_code": "# 定义 cast_spell 函数\n\n\n# 调用并打印\n\n",
+      "test_cases": [
+        {
+          "type": "output_match",
+          "expected": "施放法术：火球术！",
+          "input_data": "",
+          "description": "输出施放法术：火球术！"
+        }
+      ],
+      "hints": [
+        "def cast_spell(spell_name):",
+        "用 return f\"施放法术：{spell_name}！\"",
+        "调用: result = cast_spell(\"火球术\")"
+      ]
+    },
+    {
+      "id": "task_02",
+      "order": 2,
+      "description": "### 任务二：伤害计算函数\n\n定义函数 `calculate_damage(base_damage, critical=False)`：\n- 如果 critical 为 True：伤害 = base_damage × 2\n- 如果 critical 为 False（默认）：伤害 = base_damage\n- 返回最终伤害值\n\n调用并打印：`calculate_damage(100)` 和 `calculate_damage(100, True)`\n\n**要求**：先输出 100，再输出 200（每行一个）",
+      "starter_code": "# 定义 calculate_damage 函数\n\n\n# 调用并打印两个结果\n\n\n",
+      "test_cases": [
+        {
+          "type": "output_match",
+          "expected": "100\n200",
+          "input_data": "",
+          "description": "普通 100，暴击 200"
+        }
+      ],
+      "hints": [
+        "def calculate_damage(base_damage, critical=False):",
+        "if critical: return base_damage * 2",
+        "else: return base_damage"
+      ]
+    },
+    {
+      "id": "task_03",
+      "order": 3,
+      "description": "### 任务三：合成魔药\n\n定义函数 `mix_potions(*ingredients)`，接收任意数量的材料名，返回用 \"+\" 连接的字符串。\n\n调用 `mix_potions(\"龙鳞\", \"月光草\", \"凤凰羽毛\")` 并打印结果。\n\n**要求**：输出 `\"龙鳞+月光草+凤凰羽毛\"`",
+      "starter_code": "# 定义 mix_potions 函数\n\n\n# 调用并打印\n\n",
+      "test_cases": [
+        {
+          "type": "output_match",
+          "expected": "龙鳞+月光草+凤凰羽毛",
+          "input_data": "",
+          "description": "用+连接所有材料"
+        }
+      ],
+      "hints": [
+        "def mix_potions(*ingredients):",
+        "用 \"+\".join(ingredients) 连接",
+        "return \"+\".join(ingredients)"
+      ]
+    }
+  ],
+  "challenge": {
+    "id": "challenge_04",
+    "order": 99,
+    "description": "### 挑战题：密码强度检测器\n\n定义函数 `check_password(password)`，判断密码强度：\n- 长度 >= 8 **且** 包含数字 **且** 包含大写字母 → 返回 `\"强\"`\n- 长度 >= 6 → 返回 `\"中\"`\n- 其他 → 返回 `\"弱\"`\n\n调用 `check_password(\"Abc12345\")` 并打印结果。\n\n**提示**：可以用 `any(c.isdigit() for c in password)` 判断是否包含数字。\n\n**要求**：输出 `\"强\"`",
+    "starter_code": "# 定义 check_password 函数\n\n\n# 调用并打印\n\n",
+    "test_cases": [
+      {
+        "type": "output_match",
+        "expected": "强",
+        "input_data": "",
+        "description": "Abc12345 是强密码"
+      }
+    ],
+    "hints": [
+      "len(password) >= 8 判断长度",
+      "any(c.isdigit() for c in password) 判断是否有数字",
+      "any(c.isupper() for c in password) 判断是否有大写"
+    ]
+  }
+}

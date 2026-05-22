@@ -22,6 +22,11 @@ def execute(code: str) -> ExecutionResult:
             error=str(e),
         )
 
+    return execute_raw(code)
+
+
+def execute_raw(code: str) -> ExecutionResult:
+
     tmp_path = Path(tempfile.gettempdir()) / f"code_quest_{hash(code) & 0x7FFFFFFF}.py"
     tmp_path.write_text(code, encoding="utf-8")
 

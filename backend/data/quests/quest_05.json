@@ -1,0 +1,88 @@
+{
+  "id": "quest_05",
+  "title": "造物之模 — 类与对象",
+  "phase": 1,
+  "order": 5,
+  "xp_reward": 200,
+  "coin_reward": 80,
+  "story": "> *派森大师拿出一本巨大的魔法造物图鉴，里面记录着各种生物的模板。*\n\n**派森大师**：「`class` 是 Python 中最强大的造物魔法。类就像一张**蓝图**，定义了某类事物的属性和行为。用这张蓝图，你可以创造无数个**对象**——每个对象都有自己的属性值，但共享相同的行为模板。」\n\n**派森大师**：「来吧，用 `class` 创造你的第一个魔法生物！」",
+  "content": "## 类与对象\n\n### 定义一个类\n```python\nclass Monster:\n    def __init__(self, name, hp, attack):\n        self.name = name      # 名字\n        self.hp = hp          # 生命值\n        self.attack = attack  # 攻击力\n\n    def take_damage(self, damage):\n        self.hp -= damage\n        print(f\"{self.name} 受到 {damage} 点伤害！剩余生命：{self.hp}\")\n```\n\n### 创建对象\n```python\ngoblin = Monster(\"哥布林\", 100, 15)\nprint(goblin.name)  # 哥布林\ngoblin.take_damage(20)  # 哥布林 受到 20 点伤害！\n```\n\n### 继承\n```python\nclass BossMonster(Monster):  # 继承 Monster\n    def __init__(self, name, hp, attack, special):\n        super().__init__(name, hp, attack)  # 调用父类\n        self.special = special\n\n    def use_special(self):\n        return f\"{self.name} 释放 {self.special}！\"\n```\n\n### self 是什么？\n`self` 指对象自身。调用 `goblin.take_damage(20)` 时，`self` 就是 `goblin`。",
+  "tasks": [
+    {
+      "id": "task_01",
+      "order": 1,
+      "description": "### 任务一：创造怪物\n\n定义一个 `Monster` 类：\n- `__init__(self, name, hp, attack)` 初始化三个属性\n- 方法 `describe(self)` 返回字符串 `\"{name} | HP:{hp} 攻击:{attack}\"`\n\n创建 `Monster(\"史莱姆\", 80, 12)` 并调用 `describe()` 打印结果。\n\n**要求**：输出 `\"史莱姆 | HP:80 攻击:12\"`",
+      "starter_code": "# 定义 Monster 类\n\n\n# 创建对象并打印 describe()\n\n",
+      "test_cases": [
+        {
+          "type": "output_match",
+          "expected": "史莱姆 | HP:80 攻击:12",
+          "input_data": "",
+          "description": "正确输出怪物信息"
+        }
+      ],
+      "hints": [
+        "class Monster:",
+        "def __init__(self, name, hp, attack):",
+        "def describe(self): return f\"{self.name} | HP:{self.hp} 攻击:{self.attack}\""
+      ]
+    },
+    {
+      "id": "task_02",
+      "order": 2,
+      "description": "### 任务二：巫师之战\n\n定义一个 `Wizard` 类：\n- 属性：`name`, `hp`, `mp`\n- 方法 `attack_target(self, target)` 打印 `\"{name} 对 {target} 释放了魔法攻击！\"`\n\n创建 `Wizard(\"甘道夫\", 200, 500)`，调用 `attack_target(\"恶龙\")`。\n\n**要求**：输出 `\"甘道夫 对 恶龙 释放了魔法攻击！\"`",
+      "starter_code": "# 定义 Wizard 类\n\n\n# 创建对象并调用 attack_target\n\n",
+      "test_cases": [
+        {
+          "type": "output_match",
+          "expected": "甘道夫 对 恶龙 释放了魔法攻击！",
+          "input_data": "",
+          "description": "攻击恶龙"
+        }
+      ],
+      "hints": [
+        "class Wizard:",
+        "def attack_target(self, target):",
+        "print(f\"{self.name} 对 {target} 释放了魔法攻击！\")"
+      ]
+    },
+    {
+      "id": "task_03",
+      "order": 3,
+      "description": "### 任务三：Boss 进化\n\n基于 Monster 类，用**继承**创建 `BossMonster`：\n- 继承 Monster（name, hp, attack）\n- 新增属性 `special_skill`\n- 方法 `use_skill(self)` 返回 `\"{name} 释放了终极技能：{special_skill}！\"`\n\n创建 `BossMonster(\"暗黑龙王\", 500, 80, \"灭世龙息\")`，调用 `describe()` 和 `use_skill()`，分别打印。\n\n**要求**：先输出 `\"暗黑龙王 | HP:500 攻击:80\"`，再输出 `\"暗黑龙王 释放了终极技能：灭世龙息！\"`",
+      "starter_code": "# 定义 Monster 类（复用任务一的）\n\n\n# 定义 BossMonster 继承 Monster\n\n\n# 创建 Boss 并调用两个方法\n\n\n",
+      "test_cases": [
+        {
+          "type": "output_contains",
+          "expected": "暗黑龙王 | HP:500 攻击:80\n暗黑龙王 释放了终极技能：灭世龙息！",
+          "input_data": "",
+          "description": "正确输出 Boss 信息和技能"
+        }
+      ],
+      "hints": [
+        "class BossMonster(Monster):",
+        "super().__init__(name, hp, attack) 调用父类初始化",
+        "self.special_skill = special_skill"
+      ]
+    }
+  ],
+  "challenge": {
+    "id": "challenge_05",
+    "order": 99,
+    "description": "### 挑战题：迷你 RPG 战斗\n\n实现一个简化的回合制战斗：\n1. 创建 `Monster` 类（name, hp, attack）+ `take_damage(self, damage)` 方法（扣血+打印）\n2. 创建 `Hero` 类（name, hp, attack）+ `attack_monster(self, monster)` 方法（对怪物造成攻击力数值的伤害）\n3. 创建 Hero(\"勇者\", 200, 50) 和 Monster(\"魔王\", 300, 40)\n4. 勇者攻击魔王，调用 `hero.attack_monster(boss)` 打印结果\n\n**要求**：输出 `\"勇者攻击了魔王，造成50点伤害！魔王剩余HP：250\"`",
+    "starter_code": "# 定义 Monster 类\n\n\n# 定义 Hero 类\n\n\n# 创建对象并攻击\n\n\n",
+    "test_cases": [
+      {
+        "type": "output_match",
+        "expected": "勇者攻击了魔王，造成50点伤害！魔王剩余HP：250",
+        "input_data": "",
+        "description": "战斗输出"
+      }
+    ],
+    "hints": [
+      "英雄攻击时调用 monster.take_damage(self.attack)",
+      "take_damage 里: self.hp -= damage; print(...)",
+      "用 f-string 拼接输出"
+    ]
+  }
+}

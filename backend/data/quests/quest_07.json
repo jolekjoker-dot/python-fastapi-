@@ -1,0 +1,88 @@
+{
+  "id": "quest_07",
+  "title": "护盾之术 — 异常处理",
+  "phase": 1,
+  "order": 7,
+  "xp_reward": 130,
+  "coin_reward": 50,
+  "story": "> *你在练习咒语时突然失控，魔杖冒出黑烟。Bug 恶魔从烟雾中现身——但这次它看起来有点不同。*\n\n**Bug 恶魔**：「别紧张，我不是来捣乱的。你的咒语刚才差点引发魔法反噬！`try/except` 就像一面防护盾，在咒语失控时保护你。让我教你正确的防护术。」\n\n**派森大师**：（点头）「连 Bug 恶魔都欣赏优雅的错误处理。」",
+  "content": "## 异常处理 try / except / finally\n\n### 基本用法\n```python\ntry:\n    number = int(input(\"请输入数字: \"))\n    print(f\"你的数字是 {number}\")\nexcept ValueError:\n    print(\"输入的不是数字！\")\nfinally:\n    print(\"程序结束\")  # 无论是否异常都执行\n```\n\n### 常见异常类型\n| 异常 | 触发条件 |\n|------|----------|\n| `ValueError` | 类型转换失败 |\n| `TypeError` | 类型不匹配 |\n| `ZeroDivisionError` | 除以零 |\n| `FileNotFoundError` | 文件不存在 |\n| `KeyError` | 字典键不存在 |\n| `IndexError` | 列表索引越界 |\n\n### 自定义异常\n```python\nclass SpellFailedError(Exception):\n    pass\n\nraise SpellFailedError(\"魔力不足！\")\n```",
+  "tasks": [
+    {
+      "id": "task_01",
+      "order": 1,
+      "description": "### 任务一：数字转换护盾\n\n写一段代码，尝试将字符串 `\"abc\"` 转换为整数。用 `try/except` 捕获 `ValueError`，并打印 `\"转换失败：不是数字\"`。\n\n**要求**：正常输出 `\"转换失败：不是数字\"`（不能直接 print，必须走 try/except 流程）",
+      "starter_code": "value = \"abc\"\n\n# 用 try/except 尝试转换\n\n",
+      "test_cases": [
+        {
+          "type": "output_match",
+          "expected": "转换失败：不是数字",
+          "input_data": "",
+          "description": "捕获 ValueError 并输出"
+        }
+      ],
+      "hints": [
+        "try: int(value)",
+        "except ValueError:",
+        "print(\"转换失败：不是数字\")"
+      ]
+    },
+    {
+      "id": "task_02",
+      "order": 2,
+      "description": "### 任务二：安全除法\n\n定义函数 `safe_divide(a, b)`：\n- 如果 b 为 0，捕获 `ZeroDivisionError`，打印 `\"不能除以零\"`\n- 否则正常计算 a / b 并打印结果\n\n调用 `safe_divide(10, 0)`。\n\n**要求**：输出 `\"不能除以零\"`",
+      "starter_code": "# 定义 safe_divide 函数\n\n\n# 调用 safe_divide(10, 0)\n\n",
+      "test_cases": [
+        {
+          "type": "output_match",
+          "expected": "不能除以零",
+          "input_data": "",
+          "description": "除以零被捕获"
+        }
+      ],
+      "hints": [
+        "def safe_divide(a, b):",
+        "try: print(a / b)",
+        "except ZeroDivisionError: print(\"不能除以零\")"
+      ]
+    },
+    {
+      "id": "task_03",
+      "order": 3,
+      "description": "### 任务三：多重防护\n\n写一段代码，尝试访问字典 `data = {\"name\": \"小明\"}` 的键 `\"age\"`。\n- 如果键不存在，捕获 `KeyError`，打印 `\"键不存在\"`\n- 最后无论如何（finally），打印 `\"查询结束\"`\n\n**要求**：先输出 `\"键不存在\"`，再输出 `\"查询结束\"`",
+      "starter_code": "data = {\"name\": \"小明\"}\n\n# 用 try/except/finally 处理\n\n\n",
+      "test_cases": [
+        {
+          "type": "output_match",
+          "expected": "键不存在\n查询结束",
+          "input_data": "",
+          "description": "捕获 KeyError + finally 执行"
+        }
+      ],
+      "hints": [
+        "try: print(data[\"age\"])",
+        "except KeyError: print(\"键不存在\")",
+        "finally: print(\"查询结束\")"
+      ]
+    }
+  ],
+  "challenge": {
+    "id": "challenge_07",
+    "order": 99,
+    "description": "### 挑战题：万能转换器\n\n定义函数 `to_int(value)`：\n- 尝试将 value 转为 int\n- 如果 value 是 float 类型，先转为 int 再返回\n- 如果是无法转换的字符串，捕获异常并打印 `\"无法转换\"`，返回 0\n- 其他类型异常也打印 `\"无法转换\"`，返回 0\n\n调用 `to_int(\"123abc\")` 并打印返回值。\n\n**要求**：输出 `\"无法转换\"` 和 `0`（两行）",
+    "starter_code": "# 定义 to_int 函数\n\n\n# 调用并打印\n\n",
+    "test_cases": [
+      {
+        "type": "output_match",
+        "expected": "无法转换\n0",
+        "input_data": "",
+        "description": "捕获异常并返回 0"
+      }
+    ],
+    "hints": [
+      "def to_int(value):",
+      "try: return int(value)",
+      "except (ValueError, TypeError): print(\"无法转换\"); return 0"
+    ]
+  }
+}

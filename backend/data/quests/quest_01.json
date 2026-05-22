@@ -1,0 +1,88 @@
+{
+  "id": "quest_01",
+  "title": "觉醒之刻 — 变量与数据类型",
+  "phase": 1,
+  "order": 1,
+  "xp_reward": 100,
+  "coin_reward": 50,
+  "story": "> *派森大师站在学院大厅中央，魔杖轻点，空气中浮现出跳动的发光符文。*\n\n**派森大师**：「欢迎来到 Python 学院，年轻的学徒。你看到的这些符文，就是**变量**——编程世界最基本的魔法单元。每个变量都有自己的**类型**：整数如你的年龄，字符串如你的名字，浮点数如你的身高，布尔值如真与假。」\n\n**派森大师**：「现在，拿起你的魔杖（键盘），开始你的第一次吟唱吧。」",
+  "content": "## 变量和数据类型\n\n### 变量\nPython 中不需要声明变量类型，直接赋值即可创建：\n\n```python\nage = 25          # 整数 (int)\nname = \"张三\"     # 字符串 (str)\nheight = 175.5   # 浮点数 (float)\nis_student = True # 布尔值 (bool)\n```\n\n### 常用数据类型\n\n| 类型 | 关键字 | 示例 | 说明 |\n|------|--------|------|------|\n| 整数 | int | `42`, `-10`, `0` | 没有小数点的数字 |\n| 字符串 | str | `\"hello\"`, `'你好'` | 文本，用引号包裹 |\n| 浮点数 | float | `3.14`, `-0.5` | 带小数点的数字 |\n| 布尔值 | bool | `True`, `False` | 真或假 |\n\n### f-string 格式化\n用 f-string 优雅地拼接字符串和变量：\n```python\nname = \"小明\"\nage = 18\nprint(f\"我叫{name}，今年{age}岁\")\n```\n\n### 类型转换\n```python\nint(\"25\")      # 字符串转整数 → 25\nstr(100)       # 整数转字符串 → \"100\"\nfloat(\"3.14\")  # 字符串转浮点数 → 3.14\nbool(1)        # 转布尔值 → True\n```\n\n### type() 查看类型\n```python\nprint(type(42))     # <class 'int'>\nprint(type(\"hi\"))   # <class 'str'>\n```",
+  "tasks": [
+    {
+      "id": "task_01",
+      "order": 1,
+      "description": "### 任务一：创建你的法师档案\n\n使用变量创建你的法师档案，包含以下信息：\n- 名字（字符串）\n- 年龄（整数）\n- 魔力值（浮点数）\n\n然后用 `print()` 和 f-string 打印一句话介绍自己。\n\n**要求**：输出必须包含名字、年龄和魔力值。",
+      "starter_code": "# 创建你的法师档案\nname = \"\"\nage = 0\npower = 0.0\n\n# 用 f-string 打印介绍\nprint()\n",
+      "test_cases": [
+        {
+          "type": "output_contains",
+          "expected": "我是",
+          "input_data": "",
+          "description": "输出应包含名字、年龄、魔力值"
+        }
+      ],
+      "hints": [
+        "用 = 给变量赋值，比如 name = \"你的名字\"",
+        "f-string 格式：f\"文字{变量}文字\"",
+        "print() 函数用来输出内容"
+      ]
+    },
+    {
+      "id": "task_02",
+      "order": 2,
+      "description": "### 任务二：金币兑换术\n\n学院大厅有个自动兑换机，能把字符串转成数字。请帮派森大师把字符串 `\"250\"` 转换为整数，再乘以 2，用 `print()` 输出结果。\n\n**要求**：最终输出 `500`",
+      "starter_code": "coins_str = \"250\"\n\n# 在这里写你的代码\n\n",
+      "test_cases": [
+        {
+          "type": "output_match",
+          "expected": "500",
+          "input_data": "",
+          "description": "输出应为 500"
+        }
+      ],
+      "hints": [
+        "int() 可以把字符串转成整数",
+        "乘法用 * 符号",
+        "试试：result = int(coins_str) * 2"
+      ]
+    },
+    {
+      "id": "task_03",
+      "order": 3,
+      "description": "### 任务三：魔法属性探测器\n\n用 `type()` 函数探测以下数据的类型，并分别打印出来：\n- 数字 `42`\n- 字符串 `\"fireball\"`\n- 布尔值 `True`\n\n**要求**：按顺序输出三个类型的 class 名称",
+      "starter_code": "# 用 type() 探测类型并打印\n\n\n\n",
+      "test_cases": [
+        {
+          "type": "output_contains",
+          "expected": "<class 'int'>\n<class 'str'>\n<class 'bool'>",
+          "input_data": "",
+          "description": "依次输出 int, str, bool 的类型"
+        }
+      ],
+      "hints": [
+        "type(42) 返回 <class 'int'>",
+        "用 print(type(...)) 来打印",
+        "依次探测：42, \"fireball\", True"
+      ]
+    }
+  ],
+  "challenge": {
+    "id": "challenge_01",
+    "order": 99,
+    "description": "### 挑战题：元素调和术\n\n派森大师给了你一段不完整的咒语。请补全它：\n1. 创建变量 `element_a` 值为 `\"火焰\"` (字符串)\n2. 创建变量 `element_b` 值为 `\"寒冰\"` (字符串)\n3. 创建变量 `power` 值为 `100` (整数)\n4. 用 f-string 打印：`\"合成魔法：火焰 + 寒冰 = 混合元素，威力值：100\"`\n\n**提示**：输出要和上面完全一致。",
+    "starter_code": "# 补全这段咒语\n\n\n\nprint()\n",
+    "test_cases": [
+      {
+        "type": "output_match",
+        "expected": "合成魔法：火焰 + 寒冰 = 混合元素，威力值：100",
+        "input_data": "",
+        "description": "输出格式要完全一致"
+      }
+    ],
+    "hints": [
+      "注意字符串中的中英文标点符号",
+      "f-string 的大括号里放变量名",
+      "三个变量：element_a, element_b, power"
+    ]
+  }
+}

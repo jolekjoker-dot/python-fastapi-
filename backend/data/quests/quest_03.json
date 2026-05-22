@@ -1,0 +1,89 @@
+{
+  "id": "quest_03",
+  "title": "循环之轮 — for / while",
+  "phase": 1,
+  "order": 3,
+  "xp_reward": 150,
+  "coin_reward": 60,
+  "story": "> *你跟着派森大师走进学院地下室，一座巨大的齿轮魔法阵在缓缓旋转。*\n\n**派森大师**：「看，这就是**循环**的力量——同样的咒语重复吟唱，直到完成使命。`for` 循环像精准的钟摆，遍历已知的序列；`while` 循环像耐心的守卫，直到条件满足才停下。」\n\n**Bug 恶魔**：（从角落里冒出）「嘿嘿，小心别写出死循环... while True 可是会让你永远困在这里的！」",
+  "content": "## for 循环和 while 循环\n\n### for 循环 — 遍历序列\n```python\nfruits = [\"苹果\", \"香蕉\", \"橙子\"]\nfor fruit in fruits:\n    print(f\"我喜欢{fruit}\")\n```\n\n### range() — 生成数字序列\n```python\nfor i in range(5):       # 0, 1, 2, 3, 4\nfor i in range(1, 6):    # 1, 2, 3, 4, 5\nfor i in range(0, 10, 2): # 0, 2, 4, 6, 8 (步长为2)\n```\n\n### while 循环 — 条件为真时重复\n```python\ncount = 0\nwhile count < 5:\n    print(f\"计数: {count}\")\n    count += 1\n```\n\n### break 和 continue\n- `break` — 立即退出循环\n- `continue` — 跳过本次，继续下一次\n\n### 列表推导式（魔法！）\n```python\nsquares = [x ** 2 for x in range(10)]\n# [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]\n```",
+  "tasks": [
+    {
+      "id": "task_01",
+      "order": 1,
+      "description": "### 任务一：召唤数字精灵\n\n用 `for` 循环打印 1 到 100 中所有 **7 的倍数**，每行一个数字。\n\n**要求**：输出 7, 14, 21, ..., 98（每个一行）",
+      "starter_code": "# 用 for + range 打印 1-100 中 7 的倍数\n\n",
+      "test_cases": [
+        {
+          "type": "output_contains",
+          "expected": "7\n14\n21\n28\n35\n42\n49\n56\n63\n70\n77\n84\n91\n98",
+          "input_data": "",
+          "description": "应输出 1-100 中 7 的倍数"
+        }
+      ],
+      "hints": [
+        "用 for i in range(1, 101) 遍历 1 到 100",
+        "用 if i % 7 == 0 判断是否是 7 的倍数",
+        "% 是取余运算符"
+      ]
+    },
+    {
+      "id": "task_02",
+      "order": 2,
+      "description": "### 任务二：魔法水晶充能\n\n魔法水晶需要充能到 100 才能激活。它每隔一秒自动吸收 15 点能量。\n\n用 `while` 循环模拟充能过程：从能量值 0 开始，每次增加 15，直到 >= 100。每次充能后打印当前能量值。最后打印 `\"充能完成！\"`。\n\n**要求**：打印 15, 30, 45, 60, 75, 90, 105，然后 `\"充能完成！\"`",
+      "starter_code": "energy = 0\n\n# 用 while 循环充能\n\n",
+      "test_cases": [
+        {
+          "type": "output_contains",
+          "expected": "15\n30\n45\n60\n75\n90\n105\n充能完成！",
+          "input_data": "",
+          "description": "逐步充能到 100+"
+        }
+      ],
+      "hints": [
+        "while energy < 100:",
+        "每次循环 energy += 15",
+        "print(energy) 显示当前能量"
+      ]
+    },
+    {
+      "id": "task_03",
+      "order": 3,
+      "description": "### 任务三：魔药材料清单\n\n用**列表推导式**，一行代码生成 1 到 20 中所有偶数的平方。\n\n**要求**：输出 `[4, 16, 36, 64, 100, 144, 196, 256, 324, 400]`",
+      "starter_code": "# 用列表推导式生成偶数的平方\nresult = \nprint(result)\n",
+      "test_cases": [
+        {
+          "type": "output_match",
+          "expected": "[4, 16, 36, 64, 100, 144, 196, 256, 324, 400]",
+          "input_data": "",
+          "description": "输出列表要完全一致"
+        }
+      ],
+      "hints": [
+        "列表推导式: [表达式 for 变量 in 范围 if 条件]",
+        "for x in range(1, 21)",
+        "条件 if x % 2 == 0, 表达式 x ** 2"
+      ]
+    }
+  ],
+  "challenge": {
+    "id": "challenge_03",
+    "order": 99,
+    "description": "### 挑战题：九九乘法表\n\n用嵌套循环打印九九乘法表，格式如下（i 从 1 到 9，j 从 1 到 i）：\n```\n1x1=1\n1x2=2  2x2=4\n1x3=3  2x3=6  3x3=9\n...（一直到最后一行）\n```\n\n**注意**：数字之间用 Tab（`\\t`）分隔，每行末尾不保留多余的 Tab。",
+    "starter_code": "# 用嵌套循环打印九九乘法表\n\n",
+    "test_cases": [
+      {
+        "type": "output_contains",
+        "expected": "1x1=1\n1x2=2\t2x2=4\n1x3=3\t2x3=6\t3x3=9\n1x4=4\t2x4=8\t3x4=12\t4x4=16\n1x5=5\t2x5=10\t3x5=15\t4x5=20\t5x5=25\n1x6=6\t2x6=12\t3x6=18\t4x6=24\t5x6=30\t6x6=36\n1x7=7\t2x7=14\t3x7=21\t4x7=28\t5x7=35\t6x7=42\t7x7=49\n1x8=8\t2x8=16\t3x8=24\t4x8=32\t5x8=40\t6x8=48\t7x8=56\t8x8=64\n1x9=9\t2x9=18\t3x9=27\t4x9=36\t5x9=45\t6x9=54\t7x9=63\t8x9=72\t9x9=81",
+        "input_data": "",
+        "description": "正确输出九九乘法表"
+      }
+    ],
+    "hints": [
+      "外层循环: for i in range(1, 10)",
+      "内层循环: for j in range(1, i + 1)",
+      "用 print(f\"{j}x{i}={i*j}\", end=\"\\t\") 不换行",
+      "内层循环结束后用 print() 换行"
+    ]
+  }
+}

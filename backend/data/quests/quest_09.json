@@ -1,0 +1,88 @@
+{
+  "id": "quest_09",
+  "title": "时之裂隙 — 异步基础",
+  "phase": 1,
+  "order": 9,
+  "xp_reward": 150,
+  "coin_reward": 60,
+  "story": "> *派森大师在半空中挥出一道裂缝，裂缝的两端时间流速似乎不同。*\n\n**派森大师**：「在 Python 的世界里，有些操作需要等待——比如读取文件、请求网络。`async/await` 让你在等待时去处理其他事情，就像在烧水的同时切菜。FastAPI 本身就是异步框架，理解这个魔法至关重要。」",
+  "content": "## 异步基础 async / await\n\n### 同步 vs 异步\n```python\n# 同步 — 一个个排队执行\nimport time\ndef task(name, delay):\n    time.sleep(delay)  # 阻塞\n    print(f\"{name} 完成\")\n\n# 异步 — 同时处理多个\nimport asyncio\nasync def task(name, delay):\n    await asyncio.sleep(delay)  # 不阻塞\n    print(f\"{name} 完成\")\n```\n\n### asyncio.gather() — 并发执行\n```python\nasync def main():\n    await asyncio.gather(\n        task(\"A\", 2),\n        task(\"B\", 1),\n        task(\"C\", 3),\n    )\n\nasyncio.run(main())\n# B 先完成 (1s)，然后 A (2s)，然后 C (3s)\n```\n\n### 关键规则\n- `async def` 定义异步函数\n- `await` 等待一个异步操作\n- 异步函数里才能用 `await`\n- `asyncio.run()` 启动异步程序",
+  "tasks": [
+    {
+      "id": "task_01",
+      "order": 1,
+      "description": "### 任务一：单人吟唱\n\n定义一个异步函数 `cast(spell_name: str)`，用 `await asyncio.sleep(0.1)` 模拟吟唱时间，然后打印 `\"吟唱 {spell_name} 完成\"`。\n\n在 `main()` 中调用 `await cast(\"火球术\")`。\n\n**要求**：输出 `\"吟唱 火球术 完成\"`",
+      "starter_code": "import asyncio\n\n# 定义异步函数 cast\n\n\nasync def main():\n    # 调用 cast\n    pass\n\nasyncio.run(main())\n",
+      "test_cases": [
+        {
+          "type": "output_match",
+          "expected": "吟唱 火球术 完成",
+          "input_data": "",
+          "description": "异步吟唱完成"
+        }
+      ],
+      "hints": [
+        "async def cast(spell_name: str):",
+        "await asyncio.sleep(0.1)",
+        "async def main(): await cast(\"火球术\")"
+      ]
+    },
+    {
+      "id": "task_02",
+      "order": 2,
+      "description": "### 任务二：三人合奏\n\n用 `asyncio.gather()` 同时吟唱三个咒语：`\"火球术\"`、`\"冰箭术\"`、`\"雷电术\"`。\n\n每个咒语吟唱 0.1 秒后打印 `\"{name} 完成\"`。\n\n**要求**：输出三行，每行是 `\"XX 完成\"`（顺序不限）",
+      "starter_code": "import asyncio\n\nasync def cast(spell_name):\n    await asyncio.sleep(0.1)\n    print(f\"{spell_name} 完成\")\n\nasync def main():\n    # 用 gather 并发执行三个\n    pass\n\nasyncio.run(main())\n",
+      "test_cases": [
+        {
+          "type": "output_contains",
+          "expected": "火球术 完成\n冰箭术 完成\n雷电术 完成",
+          "input_data": "",
+          "description": "三个咒语并发完成"
+        }
+      ],
+      "hints": [
+        "await asyncio.gather(cast(\"火球术\"), cast(\"冰箭术\"), cast(\"雷电术\"))",
+        "gather 会同时启动所有协程",
+        "完成的顺序取决于 sleep 时间"
+      ]
+    },
+    {
+      "id": "task_03",
+      "order": 3,
+      "description": "### 任务三：同步 vs 异步对比\n\n用 `time.time()` 记录开始时间，先用 `asyncio.gather` 并发执行 3 个各 sleep(0.1) 的异步任务，计算总耗时并打印。\n\n**要求**：输出总耗时（应约 0.1 秒，而非 0.3 秒），格式为 `\"耗时: X.XX 秒\"`。X.XX 可以不同，只要 < 0.2 即可。",
+      "starter_code": "import asyncio\nimport time\n\nasync def task(name):\n    await asyncio.sleep(0.1)\n\nasync def main():\n    start = time.time()\n    await asyncio.gather(task(\"A\"), task(\"B\"), task(\"C\"))\n    elapsed = time.time() - start\n    print(f\"耗时: {elapsed:.2f} 秒\")\n\nasyncio.run(main())\n",
+      "test_cases": [
+        {
+          "type": "output_contains",
+          "expected": "耗时: 0.",
+          "input_data": "",
+          "description": "并发耗时约 0.1 秒"
+        }
+      ],
+      "hints": [
+        "gather 并发执行，总时间等于最慢的那个",
+        "3 个各 0.1 秒并发 ≈ 总共 0.1 秒",
+        "代码框架已经给出，直接抄上来运行即可"
+      ]
+    }
+  ],
+  "challenge": {
+    "id": "challenge_09",
+    "order": 99,
+    "description": "### 挑战题：异步图书馆\n\n模拟异步从三个魔法图书馆获取资料：\n1. 定义 `async def fetch_book(library: str, delay: float) -> str`，await sleep(delay) 后返回 `\"{library} 的资料\"`\n2. 用 `asyncio.gather()` 并发请求 3 个图书馆：\n   - `\"元素图书馆\"` (0.15 秒)\n   - `\"咒语图书馆\"` (0.10 秒)\n   - `\"历史图书馆\"` (0.20 秒)\n3. 打印每个返回值\n\n**要求**：输出三行 `\"XX图书馆 的资料\"`",
+    "starter_code": "import asyncio\n\n# 定义 fetch_book\n\n\nasync def main():\n    # 并发请求 3 个图书馆\n    pass\n\nasyncio.run(main())\n",
+    "test_cases": [
+      {
+        "type": "output_contains",
+        "expected": "元素图书馆 的资料\n咒语图书馆 的资料\n历史图书馆 的资料",
+        "input_data": "",
+        "description": "三个图书馆资料获取完成"
+      }
+    ],
+    "hints": [
+      "async def fetch_book(library: str, delay: float) -> str:",
+      "await asyncio.sleep(delay); return f\"{library} 的资料\"",
+      "results = await asyncio.gather(fetch_book(...), ...)"
+    ]
+  }
+}

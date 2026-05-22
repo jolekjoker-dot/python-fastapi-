@@ -1,0 +1,70 @@
+{
+  "id": "quest_10",
+  "title": "Boss 战 — 学徒试炼·终章",
+  "phase": 1,
+  "order": 10,
+  "xp_reward": 500,
+  "coin_reward": 200,
+  "story": "> *派森大师站上学院中央的决斗台，手中法杖指向天空。乌云聚拢，一道闪电劈下——Bug 恶魔的幻影从黑烟中凝成实体。*\n\n**派森大师**：「学徒，这是你的毕业考试。你需要在没有详细提示的情况下，运用前面 9 关学到的所有咒语，完成一个完整的『魔法学院管理系统』。」\n\n**Bug 恶魔**：「嘿嘿...前面都是小儿科，这次看你还能不能一次通过！」",
+  "content": "## Boss 战：魔法学院管理系统\n\n### 要求\n\n综合运用前 9 关的知识：变量、条件、循环、函数、类、集合、异常处理、类型注解。\n\n### 你需要实现\n\n1. **Student 类** — name, student_id, scores(list), average(), is_passed()\n2. **Academy 类** — add_student(), find_by_id(), get_top(n), remove_student()\n3. 完整类型注解\n4. 异常处理（查找不存在的学生时 raise 异常）\n\n### 通关条件\n完成全部 3 个任务，所有测试通过即可获得『初级法师』称号！",
+  "tasks": [
+    {
+      "id": "task_10_01",
+      "order": 1,
+      "description": "### Boss 战任务一：Student 类\n\n定义 `Student` 类：\n- `__init__(self, student_id: int, name: str, scores: list[float])`\n- `average(self) -> float`：返回平均分（保留一位小数）\n- `is_passed(self) -> bool`：平均分 >= 60 返回 True\n\n创建 `Student(1, \"小法师\", [85.0, 90.0, 78.0])`，打印 `average()` 和 `is_passed()`。\n\n**要求**：先输出 `84.3`，再输出 `True`",
+      "starter_code": "# 定义 Student 类\n\n\n# 创建对象并打印 average() 和 is_passed()\n\n\n",
+      "test_cases": [
+        {
+          "type": "output_match",
+          "expected": "84.3\nTrue",
+          "input_data": "",
+          "description": "平均分 84.3，及格 True"
+        }
+      ],
+      "hints": [
+        "average = sum(self.scores) / len(self.scores)",
+        "用 round(avg, 1) 保留一位小数",
+        "return self.average() >= 60 判断及格"
+      ]
+    },
+    {
+      "id": "task_10_02",
+      "order": 2,
+      "description": "### Boss 战任务二：Academy 管理类\n\n定义 `Academy` 类：\n- `__init__(self)` 初始化空的学生列表\n- `add_student(self, student: Student)` 添加学生\n- `find_by_id(self, student_id: int) -> Student`：找到返回 Student，找不到抛 `ValueError(f\"学生 {student_id} 不存在\")`\n- `get_top(self, n: int) -> list[Student]`：返回平均分最高的 n 个学生\n\n创建 Academy，添加两个学生：\n- Student(1, \"小明\", [85, 90, 78])\n- Student(2, \"小红\", [92, 88, 95])\n\n调用 `get_top(1)` 打印第一名学生的名字。\n\n**要求**：输出 `\"小红\"`",
+      "starter_code": "# 定义 Student 类和 Academy 类\n\n\n# 创建 Academy，添加两个学生\n\n\n# 获取第一名并打印名字\n\n",
+      "test_cases": [
+        {
+          "type": "output_match",
+          "expected": "小红",
+          "input_data": "",
+          "description": "第一名是小红"
+        }
+      ],
+      "hints": [
+        "get_top 中用 sorted(key=lambda s: s.average(), reverse=True)",
+        "return sorted_students[:n]",
+        "用 .name 属性获取名字"
+      ]
+    },
+    {
+      "id": "task_10_03",
+      "order": 3,
+      "description": "### Boss 战任务三：异常处理 + 完整测试\n\n在上一个任务的基础上，添加异常处理：\n1. 尝试 `find_by_id(99)`（不存在的学生）\n2. 用 `try/except` 捕获 `ValueError`，打印 `\"学生不存在\"`\n\n添加第三个学生：\n- Student(3, \"小刚\", [65, 70, 72])\n\n调用 `get_top(2)` 打印前两名的名字（每行一个）。\n\n**要求**：先输出 `\"学生不存在\"`，再输出 `\"小红\"` 和 `\"小明\"`（小红第一，小明第二）",
+      "starter_code": "# 复用前面的 Student 和 Academy 类\n\n\n# 添加三个学生\n\n\n# try/except 查找不存在的学生\n\n\n# 获取前两名并打印名字\n\n\n",
+      "test_cases": [
+        {
+          "type": "output_match",
+          "expected": "学生不存在\n小红\n小明",
+          "input_data": "",
+          "description": "异常捕获 + 前两名输出"
+        }
+      ],
+      "hints": [
+        "try: academy.find_by_id(99)",
+        "except ValueError as e: print(\"学生不存在\")",
+        "top2 = academy.get_top(2); for s in top2: print(s.name)"
+      ]
+    }
+  ],
+  "challenge": null
+}

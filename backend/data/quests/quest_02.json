@@ -1,0 +1,87 @@
+{
+  "id": "quest_02",
+  "title": "选择之杖 — 条件判断",
+  "phase": 1,
+  "order": 2,
+  "xp_reward": 120,
+  "coin_reward": 50,
+  "story": "> *派森大师递给你一根刻满符文的选择之杖。*\n\n**派森大师**：「你已经掌握了变量，但真正的魔法需要**判断力**。这根法杖会根据你的意愿，选择释放不同的法术。`if`、`elif`、`else` 就是你的判断咒语。」\n\n**比特精灵**：（小声）「记住，比较用 `==`，不等于用 `!=`，一个等号 `=` 是赋值哦~」",
+  "content": "## 条件判断 if / elif / else\n\n### 基本语法\n```python\nage = 18\n\nif age < 18:\n    print(\"未成年\")\nelif age == 18:\n    print(\"刚成年\")\nelse:\n    print(\"成年人\")\n```\n\n### 比较运算符\n| 运算符 | 含义 | 示例 |\n|--------|------|------|\n| `==` | 等于 | `x == 5` |\n| `!=` | 不等于 | `x != 5` |\n| `>` | 大于 | `x > 5` |\n| `<` | 小于 | `x < 5` |\n| `>=` | 大于等于 | `x >= 5` |\n| `<=` | 小于等于 | `x <= 5` |\n\n### 逻辑运算符\n- `and` — 两个条件都为 True\n- `or` — 至少一个条件为 True\n- `not` — 取反\n\n```python\nif age >= 18 and has_ticket:\n    print(\"允许入场\")\n```\n\n### 注意缩进！\nPython 用缩进（通常 4 个空格）表示代码块，缩进不对代码就跑不对。",
+  "tasks": [
+    {
+      "id": "task_01",
+      "order": 1,
+      "description": "### 任务一：魔法门禁\n\n学院有三个区域：图书馆（18 岁以上可进）、训练场（12-17 岁可进）、休息室（所有人可进）。\n\n变量 `age` 已给定为 15，请写程序判断这个人能进入哪个区域。\n\n**要求**：输出 `\"可以进入：训练场\"`",
+      "starter_code": "age = 15\n\n# 用 if/elif/else 判断\n\n",
+      "test_cases": [
+        {
+          "type": "output_match",
+          "expected": "可以进入：训练场",
+          "input_data": "",
+          "description": "age=15 应输出训练场"
+        }
+      ],
+      "hints": [
+        "用 if age >= 18: 判断是否成年",
+        "elif 后面跟第二个条件",
+        "print() 里写对应的区域名"
+      ]
+    },
+    {
+      "id": "task_02",
+      "order": 2,
+      "description": "### 任务二：魔法水晶鉴定\n\n魔法水晶的纯度决定了它的等级。给定变量 `purity`，写出鉴定逻辑：\n- 纯度 >= 90：输出 `\"SSR 传说水晶\"`\n- 纯度 >= 70：输出 `\"SR 稀有水晶\"`\n- 纯度 >= 50：输出 `\"R 普通水晶\"`\n- 纯度 < 50：输出 `\"N 瑕疵水晶\"`\n\n**要求**：purity = 85 时输出 `\"SR 稀有水晶\"`",
+      "starter_code": "purity = 85\n\n# 写出鉴定逻辑\n\n",
+      "test_cases": [
+        {
+          "type": "output_match",
+          "expected": "SR 稀有水晶",
+          "input_data": "",
+          "description": "purity=85 应输出 SR 稀有水晶"
+        }
+      ],
+      "hints": [
+        "先从最高的条件开始判断：if purity >= 90",
+        "第二个用 elif purity >= 70",
+        "最后一个用 else"
+      ]
+    },
+    {
+      "id": "task_03",
+      "order": 3,
+      "description": "### 任务三：优惠票价系统\n\n电影院票价规则：\n- 12 岁以下或 60 岁以上：半价（输出 `\"半价\"`）\n- 其他年龄：全价（输出 `\"全价\"`）\n\n变量 `age = 8`。用逻辑运算符 `or` 写出判断逻辑。\n\n**要求**：输出 `\"半价\"`",
+      "starter_code": "age = 8\n\n# 用 or 逻辑运算符判断\n\n",
+      "test_cases": [
+        {
+          "type": "output_match",
+          "expected": "半价",
+          "input_data": "",
+          "description": "age=8 输出半价"
+        }
+      ],
+      "hints": [
+        "用 or 连接两个条件：age < 12 or age > 60",
+        "if 和 else 就够，不需要 elif"
+      ]
+    }
+  ],
+  "challenge": {
+    "id": "challenge_02",
+    "order": 99,
+    "description": "### 挑战题：石头剪刀布\n\n实现一个简化版的石头剪刀布判断：\n- 变量 `player_a` = `\"石头\"`\n- 变量 `player_b` = `\"剪刀\"`\n- 规则：石头赢剪刀，剪刀赢布，布赢石头，相同则平局\n\n**要求**：输出 `\"玩家A获胜\"`",
+    "starter_code": "player_a = \"石头\"\nplayer_b = \"剪刀\"\n\n# 判断胜负并输出结果\n\n",
+    "test_cases": [
+      {
+        "type": "output_match",
+        "expected": "玩家A获胜",
+        "input_data": "",
+        "description": "石头 vs 剪刀，A 获胜"
+      }
+    ],
+    "hints": [
+      "用 if/elif/else 逐种情况判断",
+      "石头赢剪刀：player_a == \"石头\" and player_b == \"剪刀\"",
+      "别忘了平局的情况"
+    ]
+  }
+}

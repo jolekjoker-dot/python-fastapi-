@@ -1,0 +1,88 @@
+{
+  "id": "quest_08",
+  "title": "预言符文 — 类型提示",
+  "phase": 1,
+  "order": 8,
+  "xp_reward": 120,
+  "coin_reward": 50,
+  "story": "> *派森大师翻开一卷古老的羊皮纸，咒语旁边密密麻麻标注着神秘的符文。*\n\n**派森大师**：「这些**类型注解**就是'预言符文'——它们不改变咒语的效果，但能提前告诉你：这个函数需要什么类型的输入，会返回什么类型的输出。FastAPI 的核心魔法 Pydantic 正是建立在类型注解之上。」\n\n**比特精灵**：「就像药水瓶上的标签——一看就知道里面装的是治疗药水还是毒药！」",
+  "content": "## 类型提示 (Type Hints)\n\n### 基本类型注解\n```python\ndef cast_spell(name: str, power: int) -> str:\n    return f\"释放 {name}，威力 {power}\"\n\nage: int = 25\nname: str = \"小明\"\nis_ready: bool = True\n```\n\n### 复合类型\n```python\nfrom typing import Optional\n\ndef find_item(name: str) -> Optional[str]:\n    \"\"\"可能返回字符串或 None\"\"\"\n    items = {\"a\": \"药水\", \"b\": \"卷轴\"}\n    return items.get(name)  # 可能返回 None\n\nscores: list[int] = [85, 90, 78]\ninfo: dict[str, int] = {\"age\": 25, \"level\": 3}\n```\n\n### dataclass — 数据类\n```python\nfrom dataclasses import dataclass\n\n@dataclass\nclass Spell:\n    name: str\n    power: int\n    element: str = \"火\"\n\nfireball = Spell(name=\"火球术\", power=80)\nprint(fireball)  # Spell(name='火球术', power=80, element='火')\n```",
+  "tasks": [
+    {
+      "id": "task_01",
+      "order": 1,
+      "description": "### 任务一：加注符文\n\n给下面的函数加上正确的类型注解，然后调用并打印结果：\n```python\ndef add_damage(base, bonus):\n    return base + bonus\n```\n\n调用 `add_damage(100, 25)` 并打印结果。\n\n**要求**：输出 `125`",
+      "starter_code": "# 给参数和返回值加上类型注解\n\n\ndef add_damage(base, bonus):\n    return base + bonus\n\n# 调用并打印\n\n",
+      "test_cases": [
+        {
+          "type": "output_match",
+          "expected": "125",
+          "input_data": "",
+          "description": "输出 125"
+        }
+      ],
+      "hints": [
+        "base: int, bonus: int",
+        "-> int 表示返回整数",
+        "类型注解只是提示，不强制检查"
+      ]
+    },
+    {
+      "id": "task_02",
+      "order": 2,
+      "description": "### 任务二：魔法商店数据类\n\n用 `dataclass` 定义一个 `ShopItem` 数据类：\n- `name: str`\n- `price: int`\n- `stock: int = 0`（默认 0）\n\n创建 `ShopItem(\"魔法药水\", 100, 5)` 并打印。\n\n**要求**：输出 `\"ShopItem(name='魔法药水', price=100, stock=5)\"`",
+      "starter_code": "from dataclasses import dataclass\n\n# 定义 ShopItem 数据类\n\n\n# 创建并打印\n\n",
+      "test_cases": [
+        {
+          "type": "output_match",
+          "expected": "ShopItem(name='魔法药水', price=100, stock=5)",
+          "input_data": "",
+          "description": "dataclass 自动生成 __repr__"
+        }
+      ],
+      "hints": [
+        "@dataclass 装饰器",
+        "class ShopItem:",
+        "name: str / price: int / stock: int = 0"
+      ]
+    },
+    {
+      "id": "task_03",
+      "order": 3,
+      "description": "### 任务三：Optional 检索\n\n写一个函数 `search_spell(name: str) -> dict | None`，在法术字典中查找：\n```python\nspells = {\"火球术\": {\"power\": 80, \"element\": \"火\"}, \"冰箭术\": {\"power\": 60, \"element\": \"水\"}}\n```\n\n调用 `search_spell(\"冰箭术\")` 并打印结果。\n\n**要求**：输出 `{'power': 60, 'element': '水'}`",
+      "starter_code": "# 定义 search_spell 函数（带类型注解）\n\n\n# 调用并打印\n\n",
+      "test_cases": [
+        {
+          "type": "output_match",
+          "expected": "{'power': 60, 'element': '水'}",
+          "input_data": "",
+          "description": "返回冰箭术信息"
+        }
+      ],
+      "hints": [
+        "def search_spell(name: str) -> dict | None:",
+        "return spells.get(name)",
+        "直接用 print 打印返回值"
+      ]
+    }
+  ],
+  "challenge": {
+    "id": "challenge_08",
+    "order": 99,
+    "description": "### 挑战题：完整类型注解\n\n设计一个函数 `create_wizard(name: str, level: int, spells: list[str] | None = None) -> dict`：\n- 返回一个字典，包含 name, level, spells（如果 spells 是 None，默认空列表）\n\n完整加上类型注解，调用 `create_wizard(\"大法师\", 99, [\"火球术\", \"传送术\"])` 并打印。\n\n**要求**：输出 `{'name': '大法师', 'level': 99, 'spells': ['火球术', '传送术']}`",
+    "starter_code": "# 定义 create_wizard 函数\n\n\n# 调用并打印\n\n",
+    "test_cases": [
+      {
+        "type": "output_match",
+        "expected": "{'name': '大法师', 'level': 99, 'spells': ['火球术', '传送术']}",
+        "input_data": "",
+        "description": "完整类型注解 + 正确输出"
+      }
+    ],
+    "hints": [
+      "参数: name: str, level: int, spells: list[str] | None = None",
+      "if spells is None: spells = []",
+      "return {\"name\": name, \"level\": level, \"spells\": spells}"
+    ]
+  }
+}

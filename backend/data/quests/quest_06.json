@@ -1,0 +1,88 @@
+{
+  "id": "quest_06",
+  "title": "元素之匣 — 集合类型",
+  "phase": 1,
+  "order": 6,
+  "xp_reward": 150,
+  "coin_reward": 60,
+  "story": "> *派森大师打开学院的宝物库，里面摆满了形态各异的魔法容器。*\n\n**派森大师**：「**列表**是有序的序列，像一排魔法药剂；**字典**是键值对的宝典，通过钥匙查找宝物；**集合**是无序且不重复的宝石匣。掌握这三种容器，你就能自如地管理任何数据。」",
+  "content": "## 列表、字典、集合\n\n### list — 有序可变序列\n```python\nbackpack = [\"药水\", \"卷轴\", \"金币\"]\nbackpack.append(\"宝石\")      # 添加\nbackpack.remove(\"卷轴\")      # 删除\nprint(backpack[0])           # 索引访问 → 药水\nprint(backpack[-1])          # 倒数第一个 → 宝石\nprint(backpack[1:3])         # 切片 → [\"卷轴\", \"金币\"]\n```\n\n### dict — 键值对\n```python\nmonster_book = {\n    \"史莱姆\": {\"hp\": 50, \"attack\": 10},\n    \"哥布林\": {\"hp\": 100, \"attack\": 15},\n}\nprint(monster_book[\"史莱姆\"][\"hp\"])  # 50\nmonster_book[\"龙\"] = {\"hp\": 500, \"attack\": 80}  # 添加\n```\n\n### set — 无序不重复\n```python\nrunes = {\"火\", \"水\", \"风\", \"火\"}\nprint(runes)  # {\"火\", \"水\", \"风\"} 重复的被去掉了\nrunes.add(\"土\")\n```\n\n### 字典推导式\n```python\nsquares = {x: x**2 for x in range(5)}\n# {0: 0, 1: 1, 2: 4, 3: 9, 4: 16}\n```",
+  "tasks": [
+    {
+      "id": "task_01",
+      "order": 1,
+      "description": "### 任务一：魔法背包管理\n\n创建一个列表 `backpack`，包含 `[\"药水\", \"卷轴\", \"金币\"]`。\n\n请完成以下操作并最后打印列表：\n1. 添加 `\"魔法石\"`\n2. 删除 `\"卷轴\"`\n3. 打印列表\n\n**要求**：输出 `[\"药水\", \"金币\", \"魔法石\"]`",
+      "starter_code": "backpack = [\"药水\", \"卷轴\", \"金币\"]\n\n# 添加魔法石\n\n# 删除卷轴\n\n# 打印\n\n",
+      "test_cases": [
+        {
+          "type": "output_match",
+          "expected": "['药水', '金币', '魔法石']",
+          "input_data": "",
+          "description": "列表操作正确"
+        }
+      ],
+      "hints": [
+        "backpack.append(\"魔法石\") 添加",
+        "backpack.remove(\"卷轴\") 删除",
+        "print(backpack)"
+      ]
+    },
+    {
+      "id": "task_02",
+      "order": 2,
+      "description": "### 任务二：怪物图鉴\n\n创建一本怪物图鉴字典 `monster_book`，包含两个怪物：\n- `\"史莱姆\"`: hp=50, attack=10\n- `\"哥布林\"`: hp=100, attack=15\n\n然后打印 `\"哥布林\"` 的攻击力。\n\n**要求**：输出 `15`",
+      "starter_code": "# 创建怪物图鉴\n\n\n# 打印哥布林的攻击力\n\n",
+      "test_cases": [
+        {
+          "type": "output_match",
+          "expected": "15",
+          "input_data": "",
+          "description": "输出 15"
+        }
+      ],
+      "hints": [
+        "monster_book = {\"史莱姆\": {\"hp\": 50, \"attack\": 10}, ...}",
+        "访问：monster_book[\"哥布林\"][\"attack\"]",
+        "print() 打印结果"
+      ]
+    },
+    {
+      "id": "task_03",
+      "order": 3,
+      "description": "### 任务三：去重魔法阵\n\n给定列表 `runes = [\"火\", \"水\", \"风\", \"火\", \"水\", \"土\", \"风\", \"雷\"]`，用 `set` 去重后再转回列表，排序后打印。\n\n**要求**：输出 `['土', '水', '火', '雷', '风']`（按字母排序）",
+      "starter_code": "runes = [\"火\", \"水\", \"风\", \"火\", \"水\", \"土\", \"风\", \"雷\"]\n\n# 用 set 去重，再排序打印\n\n",
+      "test_cases": [
+        {
+          "type": "output_match",
+          "expected": "['土', '水', '火', '雷', '风']",
+          "input_data": "",
+          "description": "去重排序输出"
+        }
+      ],
+      "hints": [
+        "set(runes) 去重",
+        "sorted(set(runes)) 排序",
+        "list(sorted(set(runes))) 转回列表"
+      ]
+    }
+  ],
+  "challenge": {
+    "id": "challenge_06",
+    "order": 99,
+    "description": "### 挑战题：词频统计\n\n给定一段文字：\n`text = \"火球 冰箭 火球 雷电 冰箭 火球 治疗\"`\n\n统计每个单词出现的次数，用字典存储，最后打印字典。\n\n**要求**：输出 `{'火球': 3, '冰箭': 2, '雷电': 1, '治疗': 1}`",
+    "starter_code": "text = \"火球 冰箭 火球 雷电 冰箭 火球 治疗\"\nwords = text.split()\n\n# 统计词频\n\n\n# 打印结果\n\n",
+    "test_cases": [
+      {
+        "type": "output_contains",
+        "expected": "'火球': 3",
+        "input_data": "",
+        "description": "词频统计正确"
+      }
+    ],
+    "hints": [
+      "text.split() 按空格分割成列表",
+      "创建一个空字典，遍历 words",
+      "if word in freq: freq[word] += 1 else: freq[word] = 1"
+    ]
+  }
+}
