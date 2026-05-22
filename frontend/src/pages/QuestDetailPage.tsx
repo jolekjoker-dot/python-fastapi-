@@ -6,6 +6,7 @@ import { TopNav } from '../components/layout/TopNav'
 import { CodeEditor } from '../components/editor/CodeEditor'
 import { ResizeHandle } from '../components/ui/ResizeHandle'
 import { usePanelResize } from '../hooks/usePanelResize'
+import { useWindowSize } from '../hooks/useWindowSize'
 import { getDraft, saveDraft, getHistory, savePreference } from '../api/persistence'
 import type { ExecutionRecord } from '../api/persistence'
 import ReactMarkdown from 'react-markdown'
@@ -29,8 +30,9 @@ export function QuestDetailPage() {
   // Debounce timer for auto-save
   const saveTimer = useRef<ReturnType<typeof setTimeout>>(null)
 
-  const leftPanel = usePanelResize(320, 220, 560)
-  const rightPanel = usePanelResize(320, 240, 500, true)
+  const { width: winW } = useWindowSize()
+  const leftPanel = usePanelResize(0.25, 0.15, 0.40, winW)
+  const rightPanel = usePanelResize(0.25, 0.18, 0.35, winW, true)
 
   const getActiveTask = (q: QuestData, idx: number): QuestTask | null => {
     const allTasks = [...q.tasks, ...(q.challenge ? [q.challenge] : [])]

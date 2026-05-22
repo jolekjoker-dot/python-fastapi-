@@ -5,6 +5,7 @@ import { CodeEditor } from '../components/editor/CodeEditor'
 import { OutputConsole } from '../components/output/OutputConsole'
 import { ResizeHandle } from '../components/ui/ResizeHandle'
 import { usePanelResize } from '../hooks/usePanelResize'
+import { useWindowSize } from '../hooks/useWindowSize'
 import { executeCode } from '../api/execute'
 import type { ExecutionResult } from '../types/code'
 
@@ -26,8 +27,9 @@ export function PlaygroundPage() {
   const [result, setResult] = useState<ExecutionResult | null>(null)
   const [running, setRunning] = useState(false)
 
-  const leftPanel = usePanelResize(288, 200, 500)
-  const rightPanel = usePanelResize(320, 240, 500, true)
+  const { width: winW } = useWindowSize()
+  const leftPanel = usePanelResize(0.25, 0.15, 0.40, winW)
+  const rightPanel = usePanelResize(0.25, 0.18, 0.35, winW, true)
 
   const handleRun = useCallback(async () => {
     setRunning(true)
