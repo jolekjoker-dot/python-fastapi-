@@ -181,8 +181,16 @@ async def get_checkin(
 # ── shop ──
 
 @router.get("/shop")
-async def get_shop():
-    return {"items": SHOP_ITEMS}
+async def get_shop(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    prefs = await get_or_create_preferences(current_user.id, db)
+    items = []
+    for item in SHOP_ITEMS:
+        owned = prefs.get(f"shop_{item['id']}", "") == "1"
+        items.append({**item, "owned": owned})
+    return {"items": items}
 
 
 @router.post("/shop/buy/{item_id}")

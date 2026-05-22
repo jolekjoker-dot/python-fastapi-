@@ -15,6 +15,7 @@ export interface ShopItem {
   icon: string
   price: number
   desc: string
+  owned?: boolean
 }
 
 export interface CheckinData {
