@@ -112,7 +112,7 @@ async def save_preference(
             UserPreference.key == data.key,
         )
     )
-    pref = result.scalar_one_or_none()
+    pref = result.scalars().first()
     if pref:
         pref.value = data.value
     else:

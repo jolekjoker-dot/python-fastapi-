@@ -34,8 +34,8 @@ async def get_achievements(
             UserPreference.key == "achievements",
         )
     )
-    pref_row = pref.scalar_one_or_none()
-    unlocked_ids = set(pref_row.value.split(",")) if pref_row and pref_row.value else set()
+    pref = pref.scalars().first()
+    unlocked_ids = set(pref.value.split(",")) if pref and pref.value else set()
 
     return [
         {
@@ -71,7 +71,7 @@ async def trigger_achievement_check(
             UserPreference.key == "achievements",
         )
     )
-    pref = pref_row.scalar_one_or_none()
+    pref = pref_row.scalars().first()
     current_ids = set(pref.value.split(",")) if pref and pref.value else set()
 
     newly_unlocked = []
@@ -85,6 +85,9 @@ async def trigger_achievement_check(
             pref.value = ",".join(sorted(current_ids))
         else:
             db.add(UserPreference(user_id=current_user.id, key="achievements", value=",".join(sorted(current_ids))))
+        # Award XP for new achievements
+        for a in newly_unlocked:
+            current_user.xp += a["xp"]
         await db.commit()
 
     return {"new_achievements": newly_unlocked}
@@ -104,7 +107,7 @@ async def checkin(
             UserPreference.key == "checkins",
         )
     )
-    pref = pref_row.scalar_one_or_none()
+    pref = pref_row.scalars().first()
     checkins = set(pref.value.split(",")) if pref and pref.value else set()
 
     if today in checkins:
@@ -142,7 +145,7 @@ async def get_checkin(
             UserPreference.key == "checkins",
         )
     )
-    pref = pref_row.scalar_one_or_none()
+    pref = pref_row.scalars().first()
     checkins = set(pref.value.split(",")) if pref and pref.value else set()
     return {
         "checkins": sorted(checkins),
@@ -184,7 +187,7 @@ async def buy_item(
             UserPreference.key == f"shop_{item_id}",
         )
     )
-    p = existing.scalar_one_or_none()
+    p = existing.scalars().first()
     if p:
         p.value = "1"
     else:
