@@ -83,7 +83,7 @@ async def submit_task(
         quest = get_quest(quest_id)
         if quest:
             total_tasks = len(quest.tasks) + (1 if quest.challenge else 0)
-            if len(progress.completed_task_list) >= total_tasks:
+            if not progress.completed and len(progress.completed_task_list) >= total_tasks:
                 progress.completed = True
                 progress.completed_at = func.now()
                 current_user.xp += quest.xp_reward
